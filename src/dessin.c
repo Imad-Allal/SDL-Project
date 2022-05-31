@@ -70,6 +70,21 @@ int rectangle(int x0,int y0, int x1, int y1, int x2, int y2, int x3, int y3, SDL
         return 1;
 }
 
+void remplirRct(int x0, int x1, int y1, int y2, SDL_Renderer *renderer){
+    int xmin = x0, ymin = y1;
+    int dx = x1 - x0, dy = y2 - y1;
+    for (int i = 0; i < dy; i++){
+        xmin++;
+        ymin++;
+        for (int j = 0; j < dx; j++)
+        {
+            SDL_RenderDrawPoint(renderer, xmin, ymin);
+            xmin++;
+        }
+        xmin = x0;
+    }
+}
+
 void cercle(int x0, int y0, int r, SDL_Renderer *renderer)
 {
     int d, y, x;
