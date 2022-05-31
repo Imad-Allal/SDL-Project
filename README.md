@@ -1,5 +1,2 @@
-<<<<<<< HEAD
-Add rotation and scaling algorithm
-=======
 SDL Project 
->>>>>>> main
+Add rotation and scaling algorithm
