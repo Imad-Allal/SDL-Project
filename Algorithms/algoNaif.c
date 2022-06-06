@@ -34,7 +34,7 @@ int Round(float x){
     return (int)(x + 0.5);
 }
 
-void verticale (int x0, int y0, int dx, int dy){
+void verticale (int x0, int y0, int dy){
     int i, x, y;
     if (dy > 0){
         y = dy + y0;
@@ -52,7 +52,7 @@ void verticale (int x0, int y0, int dx, int dy){
     }    
 }
 
-void horizontale (int x0, int y0, int dx, int dy){
+void horizontale (int x0, int y0, int dx){
     int i, x, y;
     if (dx > 0){
         x = x0 + dx;
@@ -74,11 +74,11 @@ void algoNaif(int x0, int y0, int dx, int dy){
     int i, x, y;
     
     if (dx == 0){
-        verticale(x0, y0, dx, dy);
+        verticale(x0, y0, dy);
     }
 
     else if (dy == 0){
-        horizontale(x0, y0, dx, dy);
+        horizontale(x0, y0, dx);
     }
     else{
         if (dx > 0){
