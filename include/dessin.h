@@ -7,6 +7,6 @@ void dessinerLigne(int, int, int, int, SDL_Renderer*);
 void rectangle(int, int, int, int, int, int, int, int, SDL_Renderer*);
 void remplirRct(int, int, int, int, SDL_Renderer*);
 void cercle(int, int, int, SDL_Renderer *);
-void cercle(int, int, int, SDL_Renderer *);
+void disque(int, int, int, SDL_Renderer *);
 
 #endif

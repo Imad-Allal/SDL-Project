@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <SDL2/SDL.h>
+#include <math.h>
 #include <time.h>
 
 #define N 3
@@ -20,83 +21,23 @@ void quit(){
 
 SDL_Point points[N];
 
-void initPoint()
-{
-    for (int i=0; i<N; i++)
-    {
-        points[i].x = 1+ rand()% HEIGHT;
-        points[i].y = 1+ rand()% WIDTH;
-        printf("(%d , %d)\n", points[i].x, points[i].y);
-    }
-}
-
 int Round(float x){
     return (int)(x + 0.5);
 }
 
-void verticale (int x0, int y0, int dx, int dy){
-    int i, x, y;
-    if (dy > 0){
-        y = dy + y0;
-        for (i = y0; i <= y; i++)
-        {
-            SDL_RenderDrawPoint(renderer, x0, i);
-        }
-    }
-    else{
-        y = y0 + dy;
-        for (i = y0; i >= y; i--)
-        {
-            SDL_RenderDrawPoint(renderer, x0, i);
-        }
-    }    
-}
-
-void horizontale (int x0, int y0, int dx, int dy){
-    int i, x, y;
-    if (dx > 0){
-        x = x0 + dx;
-        for (int i = x0; i <= x; i++)
-        {
-            SDL_RenderDrawPoint(renderer, i, y0);
-        }
-    }
-    else {
-        x = x0 + dx;
-        for (int i = x0; i >= x; i--)
-        {
-            SDL_RenderDrawPoint(renderer, i, y0);
-        }
-    }  
-}
-
-void algoNaif(int x0, int y0, int dx, int dy){
-    int i, x, y;
+void cercle(int cx, int cy , int r){
+    int x0 = cx - r;
+    int x1 = cx + r;
+    int y0, y1;
     
-    if (dx == 0){
-        verticale(x0, y0, dx, dy);
-    }
+    while(x0 <= x1){
+        y0 = (cy + sqrt(pow(r, 2) - pow((x0 - cx), 2)));
+        SDL_RenderDrawPoint(renderer, x0, round(y0));
 
-    else if (dy == 0){
-        horizontale(x0, y0, dx, dy);
-    }
-    else{
-        if (dx > 0){
-            float m = ((float)dy) / ((float)dx);
-            for (int i = 0; i < dx; i++){
-                x = x0 + i;
-                y = Round(y0 + m * i);
-                SDL_RenderDrawPoint(renderer, x, y);
-            }
-        }
-        else{
-            float m = ((float)dy) / ((float)dx);
-            for (int i = 0; i > dx; i--){
-                x = x0 + i;
-                y = Round(y0 + m * i);
-                SDL_RenderDrawPoint(renderer, x, y);
-            }
-        }
+        y1 = (cy - sqrt(pow(r, 2) - pow((x0 - cx), 2)));
+        SDL_RenderDrawPoint(renderer, x0, round(y1));
+
+        x0++;
     }
 }
 
@@ -130,15 +71,10 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    points[0].x = 200;
+    points[0].x = 400;
     points[0].y = 400;
-    points[1].x = 400;
-    points[1].y = 200;
 
-    int dx = points[1].x - points[0].x;
-    int dy = points[1].y - points[0].y;
-    algoNaif(points[0].x, points[0].y, dx, dy);
-    SDL_RenderPresent(renderer);
+    cercle(points[0].x, points[0].y, 200);
 
     SDL_Event event;
     SDL_bool quitter = SDL_FALSE;
