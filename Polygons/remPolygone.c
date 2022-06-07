@@ -101,6 +101,9 @@ int Fsigne (SDL_Point p0, SDL_Point p1, int xm, int ym){
     dx = p1.x - p0.x;
     dy = p1.y - p0.y;
     f = dy * (xm - p0.x) - dx * (ym - p0.y);
+
+    if (dx<0)
+        return (-f);
     return f;
 }
 
@@ -128,21 +131,18 @@ void remplirPolygone(int xmin, int xmax, int ymin, int ymax){
                 }
                 else{
                     if (i == N - 1){
-                        if (Fsigne(points[i], points[0], x, y) > 0){
-                            cle = 2;
+                        if (Fsigne(points[i], points[0], x, y) < 0)
+                        {
                             break;
                         }
                         else {
+                            //printf("%d\n", Fsigne(points[i], points[0], x, y));
                             SDL_RenderDrawPoint(renderer, x, y);
                         }
                     }
                     else{
-                        if (Fsigne(points[i], points[0], x, y) > 0){
-                                cle = 2;
+                        if (Fsigne(points[i], points[i+1], x, y) < 0){
                                 break;
-                        }
-                        else {
-                            SDL_RenderDrawPoint(renderer, x, y);
                         }
                     }
                 }
@@ -156,6 +156,8 @@ void remplirPolygone(int xmin, int xmax, int ymin, int ymax){
 int main(int argc, char *argv[])
 {
     int xmin, xmax, ymin, ymax;
+
+    printf("T: Tracer le polygone\nR: Tracer le rectangle entourant le polygone\nP: Remplir le polygone\nE: Nettoyer la fenêtre\nA: Quitter\n\n");
 
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
     {
@@ -204,7 +206,8 @@ int main(int argc, char *argv[])
             algoNaif(points[i].x, points[i].y, points[i+1].x, points[i+1].y);
     }
 
-    //Zone du rectangle d'apres le polygone
+    SDL_RenderPresent(renderer);
+    // Zone du rectangle d'apres le polygone
     xmin = points[0].x;
     xmax = points[0].x;
     ymin = points[0].y;
@@ -237,20 +240,6 @@ int main(int argc, char *argv[])
     rect[3].x = xmin;
     rect[3].y = ymax;
 
-    //Tracage du rectangle
-    for (int i = 0; i < 4; i++){
-        if(i == 3){ 
-            algoNaif(rect[i].x, rect[i].y, rect[0].x, rect[0].y);
-        }
-        else
-        algoNaif(rect[i].x, rect[i].y, rect[i+1].x, rect[i+1].y);
-    }
-    SDL_RenderPresent(renderer);
-    //Tracage du rectangle
-    //Rectangle
-
-    remplirPolygone(xmin, xmax, ymin, ymax);
-    SDL_RenderPresent(renderer);
 
     SDL_Event event;
     SDL_bool quitter = SDL_FALSE;
@@ -265,17 +254,44 @@ int main(int argc, char *argv[])
                         quitter = SDL_TRUE;
                         quit();
                         break;
+                    case SDLK_t:
+                        printf("Tracage de polygone\n");
+                        for (int i = 0; i < N; i++){
+                            if (i == N-1)
+                                algoNaif(points[i].x, points[i].y, points[0].x, points[0].y);
+                            else
+                                algoNaif(points[i].x, points[i].y, points[i+1].x, points[i+1].y);
+                        }
+                        SDL_RenderPresent(renderer);
+                        break;
+                    case SDLK_p:
+                        printf("Remplissage de polygone\n");
+                        remplirPolygone(xmin, xmax, ymin, ymax);
+                        SDL_RenderPresent(renderer);
+                        break;
+                    case SDLK_r:
+                        printf("Tracage du rectangle\n");
+                        for (int i = 0; i < 4; i++){
+                            if(i == 3){ 
+                                algoNaif(rect[i].x, rect[i].y, rect[0].x, rect[0].y);
+                            }
+                            else
+                            algoNaif(rect[i].x, rect[i].y, rect[i+1].x, rect[i+1].y);
+                        }
+                        SDL_RenderPresent(renderer);
+                        break;
+                    case SDLK_e:
+                        printf("Effacer dessin\n");
+                        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+                        SDL_RenderClear(renderer);
+                        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+                        SDL_RenderPresent(renderer);
+                        break;
                     default:
                         printf("Vous avez appuyé sur la touche : %c\n", event.key.keysym.sym);
                         continue;
                     }
                     break;
-                case SDL_KEYUP:
-                switch (event.key.keysym.sym) {
-                    default:
-                        printf("touche : %c relaché\n",event.key.keysym.sym);
-                        continue;
-                    }
                 case SDL_QUIT: quitter = SDL_TRUE;
                     quit();
                     break;
