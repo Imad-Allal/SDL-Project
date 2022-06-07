@@ -98,7 +98,6 @@ void algoNaif(int x0, int y0, int x1, int y1){
 }
 
 void rotate (int x, int y, int cx, int cy, double angle){
-    int x1, y1;
     points[n].x = cx + (x - cx) * cos(angle) - (y - cy) * sin(angle);
     points[n].y = cy + (x - cy) * sin(angle) + (y - cy) * cos(angle);
 }
