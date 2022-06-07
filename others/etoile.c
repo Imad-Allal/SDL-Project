@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
     }
 
     if (SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255) != 0) {    
-        fprintf(stderr,"Collor error %s", SDL_GetError());
+        fprintf(stderr,"Color error %s", SDL_GetError());
         quit();
         return EXIT_FAILURE;
     }
