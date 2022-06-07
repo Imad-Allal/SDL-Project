@@ -99,8 +99,8 @@ void algoNaif(int x0, int y0, int x1, int y1){
 
 void rotate (int x, int y, int cx, int cy, double angle){
     int x1, y1;
-    points[n].x = Round(cx + (x - cx) * cos(angle) - (y - cy) * sin(angle));
-    points[n].y = Round(cy + (x - cy) * sin(angle) + (y - cy) * cos(angle));
+    points[n].x = cx + (x - cx) * cos(angle) - (y - cy) * sin(angle);
+    points[n].y = cy + (x - cy) * sin(angle) + (y - cy) * cos(angle);
 }
 
 int main(int argc, char *argv[])
@@ -162,7 +162,6 @@ int main(int argc, char *argv[])
 
     cx = ((points[1].x - points[0].x) / 2) + points[0].x;
     cy = ((points[2].y - points[1].y) / 2) + points[1].y;
-    printf("cx = %d cy = %d\n", cx, cy);
 
     while(angle < 0.175){
         for (int i = 0; i<N; i++){

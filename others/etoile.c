@@ -4,7 +4,7 @@
 #include <math.h>
 #include <time.h>
 
-#define N 5
+#define N 4
 #define WIDTH 1500
 #define HEIGHT 1000
 #define PI 3.141592653589793
@@ -96,7 +96,8 @@ void algoNaif(int x0, int y0, int x1, int y1){
     }
 }
 
-void etoile(int cx, int cy, int r, float angle){
+void etoile(int cx, int cy, int r){
+    float angle = 0;
     int r2 = r / 2;
     for (int i = 0; i < (N * 2); i++)
     {
@@ -117,12 +118,16 @@ void etoile(int cx, int cy, int r, float angle){
 
 void rotate (int x, int y, int cx, int cy, double angle){
     int x1, y1;
-    points[n].x = Round(cx + (x - cx) * cos(angle) - (y - cy) * sin(angle));
-    points[n].y = Round(cy + (x - cy) * sin(angle) + (y - cy) * cos(angle));
+    points[n].x = cx + (x - cx) * cos(angle) - (y - cy) * sin(angle);
+    points[n].y = cy + (x - cy) * sin(angle) + (y - cy) * cos(angle);
 }
 
 int main(int argc, char *argv[])
 {
+
+    int angle = 0.1;
+    int cx, cy;
+
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
     {
         fprintf(stderr, "SDL creation error : %s", SDL_GetError());
@@ -151,7 +156,7 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    etoile(400, 400, 100, 0);
+    etoile(400, 400, 100);
 
     for (int i = 0; i < N*2; i++){
         if (i == (N*2)-1)
@@ -159,6 +164,46 @@ int main(int argc, char *argv[])
         else
             algoNaif(points[i].x, points[i].y, points[i+1].x, points[i+1].y);
     }
+    SDL_RenderPresent(renderer);
+    SDL_Delay(100);
+
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+    cx = 400;
+    cy = 400;
+
+    while(angle < 0.5){
+        for (int i = 0; i < N*2; i++){
+            if (i == (N*2)-1)
+                algoNaif(points[i].x, points[i].y, points[0].x, points[0].y);
+            else
+                algoNaif(points[i].x, points[i].y, points[i+1].x, points[i+1].y);
+        }
+
+        SDL_RenderPresent(renderer);
+        SDL_Delay(15);
+
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+
+
+        for (int i = 0; i<(N*2); i++){
+            rotate(points[i].x, points[i].y, cx, cy, angle);
+            n++;
+        }
+        n = 0;
+        angle += 0.1;
+    }
+    for (int i = 0; i < N*2; i++){
+        if (i == (N*2)-1)
+            algoNaif(points[i].x, points[i].y, points[0].x, points[0].y);
+        else
+            algoNaif(points[i].x, points[i].y, points[i+1].x, points[i+1].y);
+    }  
 
     SDL_RenderPresent(renderer);
 
