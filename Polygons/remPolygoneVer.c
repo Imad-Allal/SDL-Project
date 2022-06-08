@@ -10,7 +10,7 @@
 
 SDL_Window *window;
 SDL_Renderer *renderer;
-int n = 0;
+int n, k;
 
 void quit(){
     if (renderer != NULL)
@@ -21,15 +21,17 @@ void quit(){
 }
 
 SDL_Point points[N];
-SDL_Point rect[4];
+
 
 int Round(float x){
     return (int)(x + 0.5);
 }
 
-void verticale (int x0, int y0, int dy){
+void verticale (int x0, int y0, int y1){
     int i, x, y;
-    if (dy > 0){
+    int dy = y1 - y0;
+    if (dy > 0)
+    {
         y = dy + y0;
         for (i = y0; i <= y; i++)
         {
@@ -70,7 +72,7 @@ void algoNaif(int x0, int y0, int x1, int y1){
 
     if (dx == 0)
     {
-        verticale(x0, y0, dy);
+        verticale(x0, y0, y1);
     }
 
     else if (dy == 0){
@@ -96,60 +98,129 @@ void algoNaif(int x0, int y0, int x1, int y1){
     }
 }
 
-int Fsigne (SDL_Point p0, SDL_Point p1, int xm, int ym){
-    int dx, dy, f;
-    dx = p1.x - p0.x;
-    dy = p1.y - p0.y;
-    f = dy * (xm - p0.x) - dx * (ym - p0.y);
+int parcourSeg(int x0, int y0, int x1, int y1, int cpt){
+    int x, y;
+    int dx = x1 - x0;
+    int dy = y1 - y0;
 
-    if (dx<0)
-        return (-f);
-    return f;
+    if (dx > 0){
+        float m = ((float)dy) / ((float)dx);
+        for (int i = cpt; i < dx; i++){
+            x = x0 + i;
+            y = Round(y0 + m * i);
+            return y;
+        }
+    }
+    else{
+        float m = ((float)dy) / ((float)dx);
+        for (int i = cpt; i > dx; i--){
+            x = x0 + i;
+            y = Round(y0 + m * i);
+            return y;
+        }
+    }
 }
 
-int decoupHaut(int xmax){
+int bordGauche(int xmin){
     for (int i = 0; i < N; i++){
-        if (points[i].x == xmax)
+        if (points[i].x == xmin){
             return i;
+        }
     }
+}
+int bordDroit(int xmax){
+    for (int i = 0; i < N; i++){
+        if (points[i].x == xmax){
+            return i;
+        }
+    }
+}
+
+int tailleP1(int min, int max){
+    int i = min, taille = 1;
+    while(i != max){
+        taille++;
+        if (i == N-1)
+            i = 0;
+        else
+            i++;
+    }
+    return taille;
+}
+
+int tailleP2(int min, int max){
+    int i = min, taille = 1;
+    while(i != max){
+        taille++;
+        if (i == 0)
+            i = N-1;
+        else
+            i--;
+    }
+    return taille;
+}
+
+SDL_Point *creerP1(int min, int max, int taille){
+    int i = min, j=0;
+    SDL_Point p[taille];
+    while (i != min)
+    {
+        p[j] = points[i];
+        j++;
+        if (i == N-1)
+            i = 0;
+        else
+            i++;
+    }
+    p[j] = points[i];
+    return p;
+}
+
+SDL_Point *creerP2(int min, int max, int taille){
+    int i = min, j=0;
+    SDL_Point p[taille];
+    while (i != max)
+    {
+        p[j] = points[i];
+        j++;
+        if (i == 0)
+            i = N-1;
+        else
+            i--;
+    }
+    p[j] = points[i];
+    return p;
 }
 
 void remplirPolygone(int xmin, int xmax, int ymin, int ymax){
-    int x, y = ymin;
-    int extremiteMax = decoupHaut(xmax);
-    int extremiteMin = N-1;
-    while (y < ymax)
-    {
-        x = xmin;
-        while (x < xmax){
-            for (int i = 0; i < N; i++){
-                if(i < extremiteMax){
-                    if (Fsigne(points[i], points[i + 1], x, y) > 0){
-                        break;
-                    }
-                }
-                else{
-                    if (i == N - 1){
-                        if (Fsigne(points[i], points[0], x, y) < 0)
-                        {
-                            break;
-                        }
-                        else {
-                            //printf("%d\n", Fsigne(points[i], points[0], x, y));
-                            SDL_RenderDrawPoint(renderer, x, y);
-                        }
-                    }
-                    else{
-                        if (Fsigne(points[i], points[i+1], x, y) < 0){
-                                break;
-                        }
-                    }
-                }
-            }
-            x++;
-        }
-        y++;
+
+    int min = bordGauche(xmin);
+    int max = bordDroit(xmax);
+    int taille1 = tailleP1(min, max);
+    int taille2 = tailleP2(min, max);
+
+    SDL_Point *p1 = creerP1(min, max, taille1), *p2 = creerP2(min, max, taille2);
+
+    int x = xmin;
+    int segHaut, segBas;
+    
+    if (min == 0){
+        segHaut = min + 1;
+        segBas = N - 1;
     }
+    else if (min == N-1){
+        segHaut = 0;
+        segBas = min - 1;
+    }
+    else {
+        segHaut = min + 1;
+        segBas = min - 1;
+    }
+
+    while (x < xmax){
+        
+    }
+
 }
 
 int main(int argc, char *argv[])
@@ -206,7 +277,7 @@ int main(int argc, char *argv[])
     }
 
     SDL_RenderPresent(renderer);
-    // Zone du rectangle d'apres le polygone
+
     xmin = points[0].x;
     xmax = points[0].x;
     ymin = points[0].y;
@@ -227,17 +298,6 @@ int main(int argc, char *argv[])
             ymin = points[i].y;
         }
     }
-    //Zone du rectangle d'apres le polygone
-
-    //Rectangle
-    rect[0].x = xmin;
-    rect[0].y = ymin;
-    rect[1].x = xmax;
-    rect[1].y = ymin;
-    rect[2].x = xmax;
-    rect[2].y = ymax;
-    rect[3].x = xmin;
-    rect[3].y = ymax;
 
 
     SDL_Event event;
@@ -266,17 +326,6 @@ int main(int argc, char *argv[])
                     case SDLK_p:
                         printf("Remplissage de polygone\n");
                         remplirPolygone(xmin, xmax, ymin, ymax);
-                        SDL_RenderPresent(renderer);
-                        break;
-                    case SDLK_r:
-                        printf("Tracage du rectangle\n");
-                        for (int i = 0; i < 4; i++){
-                            if(i == 3){ 
-                                algoNaif(rect[i].x, rect[i].y, rect[0].x, rect[0].y);
-                            }
-                            else
-                            algoNaif(rect[i].x, rect[i].y, rect[i+1].x, rect[i+1].y);
-                        }
                         SDL_RenderPresent(renderer);
                         break;
                     case SDLK_e:

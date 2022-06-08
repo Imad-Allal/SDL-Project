@@ -4,7 +4,7 @@
 #include <math.h>
 #include <time.h>
 
-#define N 5
+#define N 6
 #define WIDTH 1500
 #define HEIGHT 1000
 #define PI 3.141592653589793
