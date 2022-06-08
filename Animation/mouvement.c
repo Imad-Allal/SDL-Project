@@ -11,6 +11,10 @@
 SDL_Window *window;
 SDL_Renderer *renderer;
 
+int xmin, xmax, ymin, ymax;
+int x, y;
+int ux = 1, uy = 1;
+
 void quit(){
     if (renderer != NULL)
         SDL_DestroyRenderer(renderer);
@@ -43,40 +47,6 @@ void horizontale (int x0, int y0, int dx){
     }  
 }
 
-void verticale (int x0, int y0, int dy){
-    int i, x, y;
-    if (dy > 0){
-        y = dy + y0;
-        for (i = y0; i <= y; i++)
-        {
-            SDL_RenderDrawPoint(renderer, x0, i);
-        }
-    }
-    else{
-        y = y0 + dy;
-        for (i = y0; i >= y; i--)
-        {
-            SDL_RenderDrawPoint(renderer, x0, i);
-        }
-    }    
-}
-
-void cercle(int cx, int cy , int r){
-    int x0 = cx - r;
-    int x1 = cx + r;
-    int y0, y1;
-
-    while(x0 <= x1){
-        y0 = cy + sqrt(pow(r, 2) - pow((x0 - cx), 2));
-        SDL_RenderDrawPoint(renderer, x0, Round(y0));
-
-        y1 = cy - sqrt(pow(r, 2) - pow((x0 - cx), 2));
-        SDL_RenderDrawPoint(renderer, x0, Round(y1));
-
-        x0++;
-    }
-}
-
 void disque(int cx, int cy , int r){
     int x0 = cx - r;
     int x1 = cx + r;
@@ -96,8 +66,45 @@ void disque(int cx, int cy , int r){
     }
 }
 
+void mouvement(int r){
+    int stop = 0;
+
+    while (stop<3){
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+        xmin = x - r;
+        ymin = y - r;
+        xmax = x + r;
+        ymax = y + r;
+
+        if (xmax == WIDTH)
+            ux = -ux;
+        if (ymax == HEIGHT){
+            uy = -uy;
+            stop++;
+        }
+        if (xmin == 0)
+            ux = -ux;
+        if (ymin == 0)
+            uy = -uy;
+
+        x = x + ux;
+        y = y + uy;
+
+        disque(x, y, r);
+        SDL_RenderPresent(renderer);
+        SDL_Delay(0.1);
+    }
+}
+
 int main(int argc, char *argv[])
 {
+    int r = 100;
+
+    printf("C: Reprendre le mouvement\nA: Quitter\n");
+
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
     {
         fprintf(stderr, "SDL creation error : %s", SDL_GetError());
@@ -129,10 +136,19 @@ int main(int argc, char *argv[])
     points[0].x = 400;
     points[0].y = 400;
 
-    cercle(points[0].x, points[0].y, 200);
-    disque(points[0].x+200, points[0].y+200, 100);
+    xmin = points[0].x - r;
+    ymin = points[0].y - r;
+    xmax = points[0].x + r;
+    ymax = points[0].y + r;
+
+    disque(points[0].x, points[0].y, r);
 
     SDL_RenderPresent(renderer);
+
+    x = points[0].x;
+    y = points[0].y;
+
+    mouvement(r);
 
     SDL_Event event;
     SDL_bool quitter = SDL_FALSE;
@@ -147,17 +163,15 @@ int main(int argc, char *argv[])
                         quitter = SDL_TRUE;
                         quit();
                         break;
+                    case SDLK_c:
+                        printf("Reprise du mouvement\n");
+                        mouvement(r);
+                        break;
                     default:
                         printf("Vous avez appuyé sur la touche : %c\n", event.key.keysym.sym);
                         continue;
                     }
                     break;
-                case SDL_KEYUP:
-                switch (event.key.keysym.sym) {
-                    default:
-                        printf("touche : %c relaché\n",event.key.keysym.sym);
-                        continue;
-                    }
                 case SDL_QUIT: quitter = SDL_TRUE;
                     quit();
                     break;
