@@ -69,7 +69,7 @@ void disque(int cx, int cy , int r){
 void mouvement(int r){
     int stop = 0;
 
-    while (stop<3){
+    while (stop<4){
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
@@ -79,17 +79,22 @@ void mouvement(int r){
         xmax = x + r;
         ymax = y + r;
 
-        if (xmax == WIDTH)
+        if (xmax == WIDTH){
             ux = -ux;
+            stop++;
+        }            
         if (ymax == HEIGHT){
             uy = -uy;
             stop++;
         }
-        if (xmin == 0)
+        if (xmin == 0){
             ux = -ux;
-        if (ymin == 0)
+            stop++;
+        }
+        if (ymin == 0){
             uy = -uy;
-
+            stop++;
+        }
         x = x + ux;
         y = y + uy;
 
@@ -103,7 +108,7 @@ int main(int argc, char *argv[])
 {
     int r = 100;
 
-    printf("C: Reprendre le mouvement\nA: Quitter\n");
+    printf("C: Activer/Reprendre le mouvement\nA: Quitter\n");
 
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
     {
@@ -148,7 +153,6 @@ int main(int argc, char *argv[])
     x = points[0].x;
     y = points[0].y;
 
-    mouvement(r);
 
     SDL_Event event;
     SDL_bool quitter = SDL_FALSE;
@@ -164,7 +168,6 @@ int main(int argc, char *argv[])
                         quit();
                         break;
                     case SDLK_c:
-                        printf("Reprise du mouvement\n");
                         mouvement(r);
                         break;
                     default:
