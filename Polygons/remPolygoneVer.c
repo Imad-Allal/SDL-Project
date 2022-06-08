@@ -10,7 +10,6 @@
 
 SDL_Window *window;
 SDL_Renderer *renderer;
-int n, k;
 
 void quit(){
     if (renderer != NULL)
@@ -98,27 +97,22 @@ void algoNaif(int x0, int y0, int x1, int y1){
     }
 }
 
-int parcourSeg(int x0, int y0, int x1, int y1, int cpt){
-    int x, y;
+int segSup(int x0, int y0, int x1, int y1, int *cpt){
+    int y;
     int dx = x1 - x0;
     int dy = y1 - y0;
-
+    float m = ((float)dy) / ((float)dx);
+    
     if (dx > 0){
-        float m = ((float)dy) / ((float)dx);
-        for (int i = cpt; i < dx; i++){
-            x = x0 + i;
-            y = Round(y0 + m * i);
-            return y;
-        }
+        y = Round(y0 + m * *cpt);
+        *cpt++;
+        return y;
     }
     else{
-        float m = ((float)dy) / ((float)dx);
-        for (int i = cpt; i > dx; i--){
-            x = x0 + i;
-            y = Round(y0 + m * i);
-            return y;
+        y = Round(y0 + m * *cpt);
+        *cpt--;
+        return y;
         }
-    }
 }
 
 int bordGauche(int xmin){
@@ -160,12 +154,12 @@ int tailleP2(int min, int max){
     return taille;
 }
 
-SDL_Point *creerP1(int min, int max, int taille){
+SDL_Point listeP1(int min, int max, SDL_Point p[], int taille){
     int i = min, j=0;
-    SDL_Point p[taille];
-    while (i != min)
+    while (i != max)
     {
         p[j] = points[i];
+        printf("%d , %d\n", p[j].x, p[j].y);
         j++;
         if (i == N-1)
             i = 0;
@@ -173,15 +167,17 @@ SDL_Point *creerP1(int min, int max, int taille){
             i++;
     }
     p[j] = points[i];
-    return p;
+    printf("%d , %d\n", p[j].x, p[j].y);
+    printf("\n");
+    return *p;
 }
 
-SDL_Point *creerP2(int min, int max, int taille){
+SDL_Point listeP2(int min, int max, SDL_Point p[], int taille){
     int i = min, j=0;
-    SDL_Point p[taille];
     while (i != max)
     {
         p[j] = points[i];
+        printf("%d , %d\n", p[j].x, p[j].y);
         j++;
         if (i == 0)
             i = N-1;
@@ -189,38 +185,39 @@ SDL_Point *creerP2(int min, int max, int taille){
             i--;
     }
     p[j] = points[i];
-    return p;
+    printf("%d , %d\n", p[j].x, p[j].y);
+    return *p;
 }
 
-void remplirPolygone(int xmin, int xmax, int ymin, int ymax){
+void remplirPolygone(int xmin, int xmax){
 
-    int min = bordGauche(xmin);
-    int max = bordDroit(xmax);
-    int taille1 = tailleP1(min, max);
-    int taille2 = tailleP2(min, max);
-
-    SDL_Point *p1 = creerP1(min, max, taille1), *p2 = creerP2(min, max, taille2);
-
+    int y0, y1;
     int x = xmin;
-    int segHaut, segBas;
-    
-    if (min == 0){
-        segHaut = min + 1;
-        segBas = N - 1;
-    }
-    else if (min == N-1){
-        segHaut = 0;
-        segBas = min - 1;
-    }
-    else {
-        segHaut = min + 1;
-        segBas = min - 1;
-    }
+    int i = 0, j = 0;
+    int cpt1 = 0, cpt2 = 0;
+    int min = bordGauche(xmin), max = bordDroit(xmax);
+    int taille1 = tailleP1(min, max), taille2 = tailleP2(min, max);
+    int *ptr1 = &cpt1, *ptr2 = &cpt2;
+    SDL_Point p1[taille1], p2[taille2];
+    listeP1(min, max, p1, taille1);
+    listeP2(min, max, p2, taille2);
+
 
     while (x < xmax){
-        
+        if(x == p1[i+1].x){
+            i++;
+            *ptr1 = 0;
+        }
+        if (x == p2[j + 1].x){
+            j++;
+            *ptr2 = 0;
+        }
+        y0 = parcourSeg(p1[i].x, p1[i + 1].x, p1[i].y, p1[i + 1].y, ptr1);
+        y1 = parcourSeg(p2[j].x, p2[j + 1].x, p2[j].y, p2[j + 1].y, ptr2);
+        verticale(x, y0, y1);
+        SDL_RenderPresent(renderer);
+        x++;
     }
-
 }
 
 int main(int argc, char *argv[])
@@ -282,6 +279,7 @@ int main(int argc, char *argv[])
     xmax = points[0].x;
     ymin = points[0].y;
     ymax = points[0].y;
+    
 
     for (int i = 0; i < N; i++)
     {
@@ -298,6 +296,16 @@ int main(int argc, char *argv[])
             ymin = points[i].y;
         }
     }
+    int bg = bordGauche(xmin);
+    int bd = bordDroit(xmax);
+    printf("Le point le plus a gauche est p[%d]\nLe point le plus a droite est p[%d]\n", bg, bd);
+    int t1 = tailleP1(bg, bd), t2 = tailleP2(bg, bd);
+    printf("Taille p1 = %d\nTaille p2 = %d\n", t1, t2);
+    SDL_Point p1[t1], p2[t2];
+
+    listeP1(bg, bd, p1, t1);
+    listeP2(bg, bd, p2, t2);
+
 
 
     SDL_Event event;
@@ -325,7 +333,7 @@ int main(int argc, char *argv[])
                         break;
                     case SDLK_p:
                         printf("Remplissage de polygone\n");
-                        remplirPolygone(xmin, xmax, ymin, ymax);
+                        remplirPolygone(xmin, xmax);
                         SDL_RenderPresent(renderer);
                         break;
                     case SDLK_e:
