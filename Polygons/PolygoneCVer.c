@@ -300,15 +300,7 @@ int main(int argc, char *argv[])
             ymin = points[i].y;
         }
     }
-    int bg = bordGauche(xmin);
-    int bd = bordDroit(xmax);
-    printf("Le point le plus a gauche est p[%d]\nLe point le plus a droite est p[%d]\n", bg, bd);
-    int t1 = tailleP1(bg, bd), t2 = tailleP2(bg, bd);
-    printf("Taille p1 = %d\nTaille p2 = %d\n", t1, t2);
-    SDL_Point p1[t1], p2[t2];
 
-    listeP1(bg, bd, p1, t1);
-    listeP2(bg, bd, p2, t2);
 
 
 
