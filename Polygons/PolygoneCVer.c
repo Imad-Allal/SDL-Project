@@ -301,9 +301,6 @@ int main(int argc, char *argv[])
         }
     }
 
-
-
-
     SDL_Event event;
     SDL_bool quitter = SDL_FALSE;
 
