@@ -23,20 +23,22 @@ struct Prl{
 };
 
 struct Equation{
-    int x,y,z,e,tq;
+    int x, y, z, e;
+    float tq;
 };
 
 
 struct Prl p1[N] = {
-    {200, 200, 200},
-    {400, 200, 200},
-    {400, 400, 200},
-    {200, 400, 200},
-
-    {200, 200, 400},
-    {400, 200, 400},
     {400, 400, 400},
-    {200, 400, 400}};
+    {800, 400, 400},
+    {800, 800, 400},
+    {400, 800, 400},
+
+    {400, 400, 800},
+    {800, 400, 800},
+    {800, 800, 800},
+    {400, 800, 800}
+};
 
 struct Equation eq[N];
 struct Prl q[N];
@@ -57,7 +59,7 @@ int Round(float x){
 }
 
 void verticale (int x0, int y0, int dy){
-    int i, x, y;
+    float i, x, y;
     if (dy > 0){
         y = dy + y0;
         for (i = y0; i <= y; i++)
@@ -75,27 +77,30 @@ void verticale (int x0, int y0, int dy){
 }
 
 void horizontale (int x0, int y0, int dx){
-    int i, x, y;
+    float i, x, y;
     if (dx > 0){
         x = x0 + dx;
-        for (int i = x0; i <= x; i++)
+        for (i = x0; i <= x; i++)
         {
             SDL_RenderDrawPoint(renderer, i, y0);
         }
     }
     else {
         x = x0 + dx;
-        for (int i = x0; i >= x; i--)
+        for (i = x0; i >= x; i--)
         {
             SDL_RenderDrawPoint(renderer, i, y0);
         }
     }  
 }
 
-void algoNaif(int x0, int y0, int dx, int dy){
-    int i, x, y;
-    
-    if (dx == 0){
+void algoNaif(int x0, int y0, int x1, int y1){
+    float i, x, y;
+    int dx = x1 - x0;
+    int dy = y1 - y0;
+
+    if (dx == 0)
+    {
         verticale(x0, y0, dy);
     }
 
@@ -105,7 +110,7 @@ void algoNaif(int x0, int y0, int dx, int dy){
     else{
         if (dx > 0){
             float m = ((float)dy) / ((float)dx);
-            for (int i = 0; i < dx; i++){
+            for (i = 0; i < dx; i++){
                 x = x0 + i;
                 y = Round(y0 + m * i);
                 SDL_RenderDrawPoint(renderer, x, y);
@@ -113,7 +118,7 @@ void algoNaif(int x0, int y0, int dx, int dy){
         }
         else{
             float m = ((float)dy) / ((float)dx);
-            for (int i = 0; i > dx; i--){
+            for (i = 0; i > dx; i--){
                 x = x0 + i;
                 y = Round(y0 + m * i);
                 SDL_RenderDrawPoint(renderer, x, y);
@@ -123,7 +128,6 @@ void algoNaif(int x0, int y0, int dx, int dy){
 }
 
 void projection(struct Oeil o){
-    int t = 1;
     
     for (int i = 0; i < N; i++)
     {
@@ -131,12 +135,10 @@ void projection(struct Oeil o){
         eq[i].y = p1[i].py - o.oy;
         eq[i].z = p1[i].pz - o.oz;
 
-        eq[i].tq = -o.oz/eq[i].z;
+        eq[i].tq = (float)-o.oz/(float)eq[i].z;
 
         q[i].px = eq[i].tq * eq[i].x + o.ox;
         q[i].py = eq[i].tq * eq[i].y + o.oy;
-
-        SDL_RenderDrawPoint(renderer, q[i].px, q[i].py);
     }
 }
 
@@ -170,10 +172,27 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    struct Oeil o = {250, 250, -500};
-    projection(o);
+    struct Oeil o = {250,250,-300};
+        projection(o);
+        algoNaif(q[0].px, q[0].py, q[4].px, q[4].py);
+        algoNaif(q[1].px, q[1].py, q[5].px, q[5].py);
+        algoNaif(q[2].px, q[2].py, q[6].px, q[6].py);
+        algoNaif(q[3].px, q[3].py, q[7].px, q[7].py);
 
-    SDL_RenderPresent(renderer);
+        algoNaif(q[0].px, q[0].py, q[1].px, q[1].py);
+        algoNaif(q[1].px, q[1].py, q[2].px, q[2].py);
+        algoNaif(q[2].px, q[2].py, q[3].px, q[3].py);
+        algoNaif(q[3].px, q[3].py, q[0].px, q[0].py);
+        
+        algoNaif(q[4].px, q[4].py, q[5].px, q[5].py);
+        algoNaif(q[5].px, q[5].py, q[6].px, q[6].py);
+        algoNaif(q[6].px, q[6].py, q[7].px, q[7].py);
+        algoNaif(q[7].px, q[7].py, q[4].px, q[4].py);
+
+        SDL_RenderPresent(renderer);
+        SDL_SetRenderDrawColor(renderer,0,0,0,255);
+        SDL_RenderClear(renderer);
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
     SDL_Event event;
     SDL_bool quitter = SDL_FALSE;
