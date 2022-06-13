@@ -104,7 +104,7 @@ void algoNaif(int x0, int y0, int x1, int y1){
 
     if (dx == 0)
     {
-        verticale(x0, y0, dy);
+        verticale(x0, y0, y1);
     }
 
     else if (dy == 0){
@@ -208,7 +208,7 @@ void remplirPolygone(int xmin, int xmax, int index){
     listeP1(min, max, p1, 3, index);
     listeP2(min, max, p2, 3, index);
 
-    while (x < xmax){
+    while (x <= xmax){
         if(x == p1[i+1].x){
             i++;
             cpt1 = 0;
@@ -399,7 +399,7 @@ int main(int argc, char *argv[])
         }
         remplirPolygone(xmin, xmax, i);
         SDL_RenderPresent(renderer);
-        SDL_SetRenderDrawColor(renderer, 0+a, 255-a, 255/a, a);
+        SDL_SetRenderDrawColor(renderer, 0+a, 150-a, 255/a, a);
         a -= 20;
         SDL_Delay(1000);
     }
