@@ -175,57 +175,16 @@ int main(int argc, char *argv[])
     struct Oeil o = {250,250,-300};
         projection(o);
         algoNaif(q[0].px, q[0].py, q[4].px, q[4].py);
-
-        SDL_RenderPresent(renderer);
-        SDL_Delay(1000);
         algoNaif(q[1].px, q[1].py, q[5].px, q[5].py);
-
-        SDL_RenderPresent(renderer);
-        SDL_Delay(1000);
         algoNaif(q[2].px, q[2].py, q[6].px, q[6].py);
-
-        SDL_RenderPresent(renderer);
-        SDL_Delay(1000);
         algoNaif(q[3].px, q[3].py, q[7].px, q[7].py);
-
-        SDL_RenderPresent(renderer);
-        SDL_Delay(1000);
-
-
-        SDL_RenderPresent(renderer);
-        SDL_Delay(1000);
         algoNaif(q[0].px, q[0].py, q[1].px, q[1].py);
-
-        SDL_RenderPresent(renderer);
-        SDL_Delay(1000);
         algoNaif(q[1].px, q[1].py, q[2].px, q[2].py);
-
-        SDL_RenderPresent(renderer);
-        SDL_Delay(1000);
         algoNaif(q[2].px, q[2].py, q[3].px, q[3].py);
-
-        SDL_RenderPresent(renderer);
-        SDL_Delay(1000);
         algoNaif(q[3].px, q[3].py, q[0].px, q[0].py);
-
-        SDL_RenderPresent(renderer);
-        SDL_Delay(1000);
-        
-
-        SDL_RenderPresent(renderer);
-        SDL_Delay(1000);
         algoNaif(q[4].px, q[4].py, q[5].px, q[5].py);
-
-        SDL_RenderPresent(renderer);
-        SDL_Delay(1000);
         algoNaif(q[5].px, q[5].py, q[6].px, q[6].py);
-
-        SDL_RenderPresent(renderer);
-        SDL_Delay(1000);
         algoNaif(q[6].px, q[6].py, q[7].px, q[7].py);
-
-        SDL_RenderPresent(renderer);
-        SDL_Delay(1000);
         algoNaif(q[7].px, q[7].py, q[4].px, q[4].py);
 
         SDL_RenderPresent(renderer);

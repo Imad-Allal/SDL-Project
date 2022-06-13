@@ -204,7 +204,11 @@ void remplirPolygone(int xmin, int xmax, int index){
     SDL_Point p1[2], p2[2];
     listeP1(min, max, p1, 2, index);
     listeP2(min, max, p2, 2, index);
-    //printf("%d, %d\n", ); 
+
+    printf("%d, %d\n", p1[0].x, p1[0].y); 
+    printf("%d, %d\n", p2[0].x, p2[0].y); 
+    printf("xmin = %d, xmax = %d\n", xmin, xmax); 
+    printf("min = %d, max = %d\n", min, max); 
 
     while (x < xmax){
         if(x == p1[i+1].x){
@@ -220,12 +224,14 @@ void remplirPolygone(int xmin, int xmax, int index){
         else
             y0 = segInf(p1[i].x, p1[i + 1].x, p1[i].y, p1[i + 1].y, cpt1);
         cpt1++;
-
-        if (p2[j].x < p2[j+1].x)
+        printf("(%d, %d), (%d, %d)\n",p1[i].x,p1[i].y), (p1[i + 1].x,  p1[i + 1].y);
+        if (p2[j].x < p2[j + 1].x)
             y1 = segSup(p2[j].x, p2[j + 1].x, p2[j].y, p2[j + 1].y, cpt2);
         else
             y1 = segInf(p2[j].x, p2[j + 1].x, p2[j].y, p2[j + 1].y, cpt2);
         cpt2++;
+        printf("(%d, %d), (%d, %d)\n",p2[i].x,p2[i].y), (p2[i + 1].x,  p2[i + 1].y);
+
         verticale(x, y0, y1);
         SDL_RenderPresent(renderer);
         x++;
@@ -255,58 +261,51 @@ void polygones(){
         points[0][i].y = q[j].py;
         j++;
     }
-    j = 3;
+    
+    j = 4;
     for (int i = 0; i < PNT; i++)
     {
         points[1][i].x = q[j].px;
         points[1][i].y = q[j].py;
-        if (j==5)
-            j = 2;
-        else
-            j++;
+        j++;
     }
-    j = 2;
-    for (int i = 0; i < PNT; i++)
-    {
-        points[2][i].x = q[j].px;
-        points[2][i].y = q[j].py;
-        if (j==1)
-            j = 6;
-        else
-            j--;
-    }
-    j = 5;
-    for (int i = 0; i < PNT; i++)
-    {
-        points[3][i].x = q[j].px;
-        points[3][i].y = q[j].py;
-        if (j==4)
-            j = 7;
-        else
-            j--;
-    }
-    j = 6;
-    for (int i = 0; i < PNT; i++)
-    {
-        points[4][i].x = q[j].px;
-        points[4][i].y = q[j].py;
-        if (j==0)
-            j = 7;
-        else if (j==1)
-            j=0;
-        else
-            j = 1;
-    }
-    j = 7;
-    for (int i = 0; i < PNT; i++)
-    {
-        points[5][i].x = q[j].px;
-        points[5][i].y = q[j].py;
-        if (j==7 || j==3)
-            j -= 3;
-        else
-            j--;
-    }
+
+    points[2][0].x = q[0].px;
+    points[2][0].y = q[0].py;
+    points[2][1].x = q[1].px;
+    points[2][1].y = q[1].py;
+    points[2][2].x = q[5].px;
+    points[2][2].y = q[5].py;
+    points[2][3].x = q[4].px;
+    points[2][3].y = q[4].py;
+
+    points[3][0].x = q[0].px;
+    points[3][0].y = q[0].py;
+    points[3][1].x = q[4].px;
+    points[3][1].y = q[4].py;
+    points[3][2].x = q[7].px;
+    points[3][2].y = q[7].py;
+    points[3][3].x = q[3].px;
+    points[3][3].y = q[3].py;
+
+    points[4][0].x = q[3].px;
+    points[4][0].y = q[3].py;
+    points[4][1].x = q[7].px;
+    points[4][1].y = q[7].py;
+    points[4][2].x = q[6].px;
+    points[4][2].y = q[6].py;
+    points[4][3].x = q[2].px;
+    points[4][3].y = q[2].py;
+
+    points[5][0].x = q[1].px;
+    points[5][0].y = q[1].py;
+    points[5][1].x = q[5].px;
+    points[5][1].y = q[5].py;
+    points[5][2].x = q[6].px;
+    points[5][2].y = q[6].py;
+    points[5][3].x = q[2].px;
+    points[5][3].y = q[2].py;
+    
 }
 
 int main(int argc, char *argv[])
@@ -350,15 +349,16 @@ int main(int argc, char *argv[])
     polygones();
 
     /*Polygones parallelepipede*/
-
     for (int i = 0; i < POL; i++)
     {
         for (int j = 0; j < PNT; j++)
         {
-            SDL_RenderDrawPoint(renderer, points[i][j].x, points[i][j].y);
+            if (j == PNT - 1)
+                SDL_RenderDrawPoint(renderer, points[i][j].x, points[0][0].y);
+            else 
+                SDL_RenderDrawPoint(renderer, points[i][j].x, points[i][j].y);
 
             SDL_RenderPresent(renderer);
-                        SDL_Delay(1000);
         }
     }
     SDL_Delay(1000);
@@ -371,46 +371,31 @@ int main(int argc, char *argv[])
             else
                 algoNaif(points[i][j].x, points[i][j].y, points[i][j+1].x, points[i][j+1].y);
             SDL_RenderPresent(renderer);
-            SDL_Delay(1000);
         }
     }
-            /*algoNaif(q[0].px, q[0].py, q[4].px, q[4].py);
-            algoNaif(q[1].px, q[1].py, q[5].px, q[5].py);
-            algoNaif(q[2].px, q[2].py, q[6].px, q[6].py);
-            algoNaif(q[3].px, q[3].py, q[7].px, q[7].py);
+    /*Polygones parallelepipede*/
 
-            algoNaif(q[0].px, q[0].py, q[1].px, q[1].py);
-            algoNaif(q[1].px, q[1].py, q[2].px, q[2].py);
-            algoNaif(q[2].px, q[2].py, q[3].px, q[3].py);
-            algoNaif(q[3].px, q[3].py, q[0].px, q[0].py);
-
-            algoNaif(q[4].px, q[4].py, q[5].px, q[5].py);
-            algoNaif(q[5].px, q[5].py, q[6].px, q[6].py);
-            algoNaif(q[6].px, q[6].py, q[7].px, q[7].py);
-            algoNaif(q[7].px, q[7].py, q[4].px, q[4].py);
-
-            SDL_RenderPresent(renderer);
-*/
     for (int i = 0; i < POL; i++){
-        for (int j = 0; j < PNT; j++){
             xmin = WIDTH;
             xmax = 0;
             ymin = HEIGHT;
             ymax = 0;
-
-            if (points[i][j].x >= xmax)
-            {
-                xmax = points[i][j].x;
-            }
-            if (points[i][j].x <= xmin){
-                xmin = points[i][j].x;
-            }
-            if (points[i][j].y >= ymax){
-                ymax = points[i][j].y;
-            }
-            if (points[i][j].y <= ymin){
-                ymin = points[i][j].y;
-            }
+        for (int j = 0; j < PNT; j++){
+            printf("(%d)\n", points[i][j].x);
+                if (points[i][j].x >= xmax)
+                {
+                    xmax = points[i][j].x;
+                    }
+                if (points[i][j].x <= xmin){
+                    xmin = points[i][j].x;
+                }
+                if (points[i][j].y >= ymax){
+                    ymax = points[i][j].y;
+                }
+                if (points[i][j].y <= ymin){
+                    ymin = points[i][j].y;
+                }
+                printf("xmin = %d, xmax = %d\n", xmin, xmax);
         }
         remplirPolygone(xmin, xmax, i);
         SDL_RenderPresent(renderer);
