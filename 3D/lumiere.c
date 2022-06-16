@@ -191,7 +191,6 @@ SDL_Point listeP2(int min, int max, SDL_Point p[], int taille, int index){
 }
 
 void remplirPolygone(int xmin, int xmax, int index){
-    printf("Polygone[%d]\n",index);
     int y0, y1;
     int x = xmin;
     int i = 0, j = 0;
@@ -387,8 +386,9 @@ int main(int argc, char *argv[])
                 if (points[i][j].y <= ymin){
                     ymin = points[i][j].y;
                 }
-                printf("xmin = %d, xmax = %d, ymin = %d, ymax = %d\n", xmin, xmax, ymin, ymax);
         }
+        printf("Polygone[%d]\n",i);
+        printf("xmin = %d, xmax = %d, ymin = %d, ymax = %d\n", xmin, xmax, ymin, ymax);
         remplirPolygone(xmin, xmax, i);
         SDL_RenderPresent(renderer);
         SDL_SetRenderDrawColor(renderer, 0+a, 255-a, 255/a, a);
