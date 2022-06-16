@@ -11,9 +11,15 @@
 
 SDL_Window *window;
 SDL_Renderer *renderer;
-SDL_Point points[6][4];
 
-struct Oeil{
+SDL_Point normal[6];
+
+struct Face {
+    int x, y, cx, cy;
+};
+
+struct Oeil
+{
     int ox,oy,oz;
 };
 
@@ -29,6 +35,8 @@ struct Equation{
     int x, y, z, e;
     float tq;
 };
+
+struct Face face[6][4];
 
 struct Prl p1[N] = {
     {400, 400, 400},
@@ -52,9 +60,6 @@ void quit(){
         SDL_DestroyWindow(window);
     SDL_Quit();
 }
-
-
-
 
 int Round(float x){
     return (int)(x + 0.5);
@@ -151,14 +156,14 @@ int segSup(int x0, int x1, int y0, int y1, int k){
 
 int bordGauche(int xmin, int index){
     for (int i = 0; i < PNT; i++){
-        if (points[index][i].x == xmin){
+        if (face[index][i].x == xmin){
             return i;
         }
     }
 }
 int bordDroit(int xmax, int index){
     for (int i = 0; i < PNT; i++){
-        if (points[index][i].x == xmax){
+        if (face[index][i].x == xmax){
             return i;
         }
     }
@@ -168,7 +173,8 @@ SDL_Point listeP1(int min, int max, SDL_Point p[], int taille, int index){
     int i = min;
 
     for (int j = 0; j < 3; j++){
-        p[j] = points[index][i];
+        p[j].x = face[index][i].x;
+        p[j].y = face[index][i].y;
         if (i == PNT-1)
             i = 0;
         else
@@ -181,7 +187,8 @@ SDL_Point listeP2(int min, int max, SDL_Point p[], int taille, int index){
     int i = min;
 
     for (int j = 0; j < 3; j++){
-        p[j] = points[index][i];
+        p[j].x = face[index][i].x;
+        p[j].y = face[index][i].y;
         if (i == 0)
             i = PNT - 1;
         else
@@ -249,56 +256,78 @@ void polygones(){
     int j = 4;
     for (int i = 0; i < PNT; i++)
     {
-        points[0][i].x = q[j].px;
-        points[0][i].y = q[j].py;
+        face[0][i].x = q[j].px;
+        face[0][i].y = q[j].py;
         j++;
     }
 
-    points[1][0].x = q[7].px;
-    points[1][0].y = q[7].py;
-    points[1][1].x = q[6].px;
-    points[1][1].y = q[6].py;
-    points[1][2].x = q[2].px;
-    points[1][2].y = q[2].py;
-    points[1][3].x = q[3].px;
-    points[1][3].y = q[3].py;
+    face[1][0].x = q[7].px;
+    face[1][0].y = q[7].py;
+    face[1][1].x = q[6].px;
+    face[1][1].y = q[6].py;
+    face[1][2].x = q[2].px;
+    face[1][2].y = q[2].py;
+    face[1][3].x = q[3].px;
+    face[1][3].y = q[3].py;
 
-    points[2][0].x = q[1].px;
-    points[2][0].y = q[1].py;
-    points[2][1].x = q[5].px;
-    points[2][1].y = q[5].py;
-    points[2][2].x = q[6].px;
-    points[2][2].y = q[6].py;
-    points[2][3].x = q[2].px;
-    points[2][3].y = q[2].py;
+    face[2][0].x = q[1].px;
+    face[2][0].y = q[1].py;
+    face[2][1].x = q[5].px;
+    face[2][1].y = q[5].py;
+    face[2][2].x = q[6].px;
+    face[2][2].y = q[6].py;
+    face[2][3].x = q[2].px;
+    face[2][3].y = q[2].py;
 
-    points[3][0].x = q[0].px;
-    points[3][0].y = q[0].py;
-    points[3][1].x = q[4].px;
-    points[3][1].y = q[4].py;
-    points[3][2].x = q[7].px;
-    points[3][2].y = q[7].py;
-    points[3][3].x = q[3].px;
-    points[3][3].y = q[3].py;
-
-    points[4][0].x = q[4].px;
-    points[4][0].y = q[4].py;
-    points[4][1].x = q[5].px;
-    points[4][1].y = q[5].py;
-    points[4][2].x = q[1].px;
-    points[4][2].y = q[1].py;
-    points[4][3].x = q[0].px;
-    points[4][3].y = q[0].py;
+    face[3][0].x = q[0].px;
+    face[3][0].y = q[0].py;
+    face[3][1].x = q[4].px;
+    face[3][1].y = q[4].py;
+    face[3][2].x = q[7].px;
+    face[3][2].y = q[7].py;
+    face[3][3].x = q[3].px;
+    face[3][3].y = q[3].py;
+    
+    face[4][0].x = q[4].px;
+    face[4][0].y = q[4].py;
+    face[4][1].x = q[5].px;
+    face[4][1].y = q[5].py;
+    face[4][2].x = q[1].px;
+    face[4][2].y = q[1].py;
+    face[4][3].x = q[0].px;
+    face[4][3].y = q[0].py;
 
     j = 0;
     for (int i = 0; i < PNT; i++)
     {
-        points[5][i].x = q[j].px;
-        points[5][i].y = q[j].py;
+        face[5][i].x = q[j].px;
+        face[5][i].y = q[j].py;
         j++;
     }
-    
 }
+
+void centre(){
+    for (int i = 0; i < POL; i++)
+    {
+            face[i][0].cx = (face[i][0].x + face[i][2].x) / 2; 
+            face[i][0].cy = (face[i][0].y + face[i][2].y) / 2;
+    }
+}
+
+/*void vNormal(){
+    SDL_Point u;
+    SDL_Point v;
+    for (int i = 0; i < POL; i++){
+        u.x = face[i][0].x - face[i][3].x;
+        u.y = face[i][0].y - face[i][3].y;
+
+        v.x = face[i][2].x - face[i][3].x;
+        v.y = face[i][2].y - face[i][3].y;
+
+        normal[i].x =.x =
+            normal[i].y =
+    }
+}*/
 
 int main(int argc, char *argv[])
 {
@@ -339,6 +368,7 @@ int main(int argc, char *argv[])
 
     projection(o);
     polygones();
+    centre();
 
     /*Polygones parallelepipede*/
     for (int i = 0; i < POL; i++)
@@ -346,9 +376,9 @@ int main(int argc, char *argv[])
         for (int j = 0; j < PNT; j++)
         {
             if (j == PNT - 1)
-                SDL_RenderDrawPoint(renderer, points[i][j].x, points[0][0].y);
+                SDL_RenderDrawPoint(renderer, face[i][j].x, face[0][0].y);
             else 
-                SDL_RenderDrawPoint(renderer, points[i][j].x, points[i][j].y);
+                SDL_RenderDrawPoint(renderer, face[i][j].x, face[i][j].y);
 
             SDL_RenderPresent(renderer);
         }
@@ -358,9 +388,9 @@ int main(int argc, char *argv[])
         for (int j = 0; j < PNT; j++)
         {
             if (j==PNT-1)
-                algoNaif(points[i][j].x, points[i][j].y, points[i][0].x, points[i][0].y);
+                algoNaif(face[i][j].x, face[i][j].y, face[i][0].x, face[i][0].y);
             else
-                algoNaif(points[i][j].x, points[i][j].y, points[i][j+1].x, points[i][j+1].y);
+                algoNaif(face[i][j].x, face[i][j].y, face[i][j+1].x, face[i][j+1].y);
             SDL_RenderPresent(renderer);
         }
     }
@@ -373,18 +403,18 @@ int main(int argc, char *argv[])
         ymin = HEIGHT;
         ymax = 0;
         for (int j = 0; j < PNT; j++){
-                if (points[i][j].x >= xmax)
+                if (face[i][j].x >= xmax)
                 {
-                    xmax = points[i][j].x;
+                    xmax = face[i][j].x;
                     }
-                if (points[i][j].x <= xmin){
-                    xmin = points[i][j].x;
+                if (face[i][j].x <= xmin){
+                    xmin = face[i][j].x;
                 }
-                if (points[i][j].y >= ymax){
-                    ymax = points[i][j].y;
+                if (face[i][j].y >= ymax){
+                    ymax = face[i][j].y;
                 }
-                if (points[i][j].y <= ymin){
-                    ymin = points[i][j].y;
+                if (face[i][j].y <= ymin){
+                    ymin = face[i][j].y;
                 }
         }
         printf("Polygone[%d]\n",i);
