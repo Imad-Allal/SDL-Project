@@ -61,20 +61,17 @@ int Round(float x){
 }
 
 void verticale (int x0, int y0, int y1){
-    printf("Verticale\n");
     float i, x, y;
     if (y1 > y0){
         for (i = y0; i <= y1; i++)
         {
             SDL_RenderDrawPoint(renderer, x0, i);
-            printf("y0 = %f, y1 = %d\n", i, y1);
         }
     }
     else{
-        for (i = y0; i > y1; i--)
+        for (i = y0; i >= y1; i--)
         {
             SDL_RenderDrawPoint(renderer, x0, i);
-            printf("y0 = %f, y1 = %f, dy = %d\n", i, y1, y);
         }
     }    
 }
@@ -172,8 +169,6 @@ SDL_Point listeP1(int min, int max, SDL_Point p[], int taille, int index){
 
     for (int j = 0; j < 3; j++){
         p[j] = points[index][i];
-        printf("xh = %d, yh = %d\n", p[j].x, p[j].y);
-        printf("\n");
         if (i == PNT-1)
             i = 0;
         else
@@ -187,8 +182,6 @@ SDL_Point listeP2(int min, int max, SDL_Point p[], int taille, int index){
 
     for (int j = 0; j < 3; j++){
         p[j] = points[index][i];
-        printf("xb = %d, yb = %d\n", p[j].x, p[j].y);
-        printf("\n");
         if (i == 0)
             i = PNT - 1;
         else
@@ -231,7 +224,6 @@ void remplirPolygone(int xmin, int xmax, int index){
             y1 = segInf(p2[j].x, p2[j + 1].x, p2[j].y, p2[j + 1].y, cpt2);
         }
         cpt2++;
-        printf("y0 = %d, y1 = %d\n", y0, y1);
 
         verticale(x, y0, y1);
         SDL_RenderPresent(renderer);
@@ -374,7 +366,7 @@ int main(int argc, char *argv[])
         }
     }
     /*Polygones parallelepipede*/
-    int a = 255;
+    int a = 105;
     for (int i = 0; i <POL; i++)
     {
         xmin = WIDTH;
@@ -399,9 +391,8 @@ int main(int argc, char *argv[])
         }
         remplirPolygone(xmin, xmax, i);
         SDL_RenderPresent(renderer);
-        SDL_SetRenderDrawColor(renderer, 0+a, 150-a, 255/a, a);
+        SDL_SetRenderDrawColor(renderer, 0+a, 255-a, 255/a, a);
         a -= 20;
-        SDL_Delay(1000);
     }
         /*
 
