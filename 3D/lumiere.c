@@ -15,7 +15,7 @@ SDL_Renderer *renderer;
 SDL_Point normal[6];
 
 struct Face {
-    int x, y, cx, cy;
+    int x, y, z, cx, cy, nx, ny, nz;
 };
 
 struct Oeil
@@ -28,7 +28,7 @@ struct Lumiere{
 };
 
 struct Prl{
-    int px,py,pz;
+    int px, py, pz;
 };
 
 struct Equation{
@@ -237,6 +237,78 @@ void remplirPolygone(int xmin, int xmax, int index){
     }
 }
 
+void polygones(struct Prl p1[8]){
+    int j = 4;
+    for (int i = 0; i < PNT; i++)
+    {
+        face[0][i].x = p1[j].px;
+        face[0][i].y = p1[j].py;
+        face[0][i].z = p1[j].pz;
+        j++;
+    }
+
+    face[1][0].x = p1[7].px;
+    face[1][0].y = p1[7].py;
+    face[1][0].z = p1[7].pz;
+    face[1][1].x = p1[6].px;
+    face[1][1].y = p1[6].py;
+    face[1][1].z = p1[6].pz;
+    face[1][2].x = p1[2].px;
+    face[1][2].y = p1[2].py;
+    face[1][2].z = p1[2].pz;
+    face[1][3].x = p1[3].px;
+    face[1][3].y = p1[3].py;
+    face[1][3].z = p1[3].pz;
+
+    face[2][0].x = p1[1].px;
+    face[2][0].y = p1[1].py;
+    face[2][0].z = p1[1].pz;
+    face[2][1].x = p1[5].px;
+    face[2][1].y = p1[5].py;
+    face[2][1].z = p1[5].pz;
+    face[2][2].x = p1[6].px;
+    face[2][2].y = p1[6].py;
+    face[2][2].z = p1[6].pz;
+    face[2][3].x = p1[2].px;
+    face[2][3].y = p1[2].py;
+    face[2][3].z = p1[2].pz;
+
+    face[3][0].x = p1[0].px;
+    face[3][0].y = p1[0].py;
+    face[3][0].z = p1[0].pz;
+    face[3][1].x = p1[4].px;
+    face[3][1].y = p1[4].py;
+    face[3][1].z = p1[4].pz;
+    face[3][2].x = p1[7].px;
+    face[3][2].y = p1[7].py;
+    face[3][2].z = p1[7].pz;
+    face[3][3].x = p1[3].px;
+    face[3][3].y = p1[3].py;
+    face[3][3].z = p1[3].pz;
+    
+    face[4][0].x = p1[4].px;
+    face[4][0].y = p1[4].py;
+    face[4][0].z = p1[4].pz;
+    face[4][1].x = p1[5].px;
+    face[4][1].y = p1[5].py;
+    face[4][1].z = p1[5].pz;
+    face[4][2].x = p1[1].px;
+    face[4][2].y = p1[1].py;
+    face[4][2].z = p1[1].pz;
+    face[4][3].x = p1[0].px;
+    face[4][3].y = p1[0].py;
+    face[4][3].z = p1[0].pz;
+
+    j = 0;
+    for (int i = 0; i < PNT; i++)
+    {
+        face[5][i].x = p1[j].px;
+        face[5][i].y = p1[j].py;
+        face[5][i].z = p1[j].pz;
+        j++;
+    }
+}
+
 void projection(struct Oeil o){
     
     for (int i = 0; i < N; i++)
@@ -249,60 +321,6 @@ void projection(struct Oeil o){
 
         q[i].px = eq[i].tq * eq[i].x + o.ox;
         q[i].py = eq[i].tq * eq[i].y + o.oy;
-    }
-}
-
-void polygones(){
-    int j = 4;
-    for (int i = 0; i < PNT; i++)
-    {
-        face[0][i].x = q[j].px;
-        face[0][i].y = q[j].py;
-        j++;
-    }
-
-    face[1][0].x = q[7].px;
-    face[1][0].y = q[7].py;
-    face[1][1].x = q[6].px;
-    face[1][1].y = q[6].py;
-    face[1][2].x = q[2].px;
-    face[1][2].y = q[2].py;
-    face[1][3].x = q[3].px;
-    face[1][3].y = q[3].py;
-
-    face[2][0].x = q[1].px;
-    face[2][0].y = q[1].py;
-    face[2][1].x = q[5].px;
-    face[2][1].y = q[5].py;
-    face[2][2].x = q[6].px;
-    face[2][2].y = q[6].py;
-    face[2][3].x = q[2].px;
-    face[2][3].y = q[2].py;
-
-    face[3][0].x = q[0].px;
-    face[3][0].y = q[0].py;
-    face[3][1].x = q[4].px;
-    face[3][1].y = q[4].py;
-    face[3][2].x = q[7].px;
-    face[3][2].y = q[7].py;
-    face[3][3].x = q[3].px;
-    face[3][3].y = q[3].py;
-    
-    face[4][0].x = q[4].px;
-    face[4][0].y = q[4].py;
-    face[4][1].x = q[5].px;
-    face[4][1].y = q[5].py;
-    face[4][2].x = q[1].px;
-    face[4][2].y = q[1].py;
-    face[4][3].x = q[0].px;
-    face[4][3].y = q[0].py;
-
-    j = 0;
-    for (int i = 0; i < PNT; i++)
-    {
-        face[5][i].x = q[j].px;
-        face[5][i].y = q[j].py;
-        j++;
     }
 }
 
@@ -364,25 +382,14 @@ int main(int argc, char *argv[])
 
     struct Oeil o = {250,250,-500};
 
+    polygones(p1); // Initialiser chaque face avant projection
+    projection(o); // Projection des faces du polygone
+    polygones(q); // Attribution des nouvelles coordonnées projetées au polygone
+    centre(); // calcule du centre de chaque face
 
-
-    projection(o);
-    polygones();
-    centre();
+/*Si on fait */
 
     /*Polygones parallelepipede*/
-    for (int i = 0; i < POL; i++)
-    {
-        for (int j = 0; j < PNT; j++)
-        {
-            if (j == PNT - 1){
-                SDL_RenderDrawPoint(renderer, face[i][j].x, face[0][0].y);
-            }
-            else {
-                SDL_RenderDrawPoint(renderer, face[i][j].x, face[i][j].y);
-            }
-        }
-    }
     for (int i = 0; i < POL; i++)
     {
         for (int j = 0; j < PNT; j++)
@@ -419,9 +426,7 @@ int main(int argc, char *argv[])
                     ymin = face[i][j].y;
                 }
         }
-        printf("Polygone[%d]\n",i);
-        printf("xmin = %d, xmax = %d, ymin = %d, ymax = %d\n", xmin, xmax, ymin, ymax);
-        remplirPolygone(xmin, xmax, i);
+        remplirPolygone(xmin, xmax, i); // Remplissage du polygone
         SDL_RenderPresent(renderer);
         SDL_SetRenderDrawColor(renderer, 0+a, 255-a, 255/a, a);
         a -= 20;
