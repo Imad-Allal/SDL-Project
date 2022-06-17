@@ -29,38 +29,39 @@ int Round(float x){
     return (int)(x + 0.5);
 }
 
-void horizontale (int x0, int y0, int dx){
+void verticale (int x0, int y0, int y1){
     int i, x, y;
-    if (dx > 0){
-        x = x0 + dx;
-        for (int i = x0; i <= x; i++)
+    int dy = y1 - y0;
+    if (dy > 0)
+    {
+        for (i = y0; i <= y1; i++)
         {
-            SDL_RenderDrawPoint(renderer, i, y0);
+            SDL_RenderDrawPoint(renderer, x0, i);
         }
     }
-    else {
-        x = x0 + dx;
-        for (int i = x0; i >= x; i--)
+    else{
+        y = y0 + dy;
+        for (i = y0; i >= y1; i--)
         {
-            SDL_RenderDrawPoint(renderer, i, y0);
+            SDL_RenderDrawPoint(renderer, x0, i);
         }
-    }  
+    }    
 }
 
 void disque(int cx, int cy , int r){
     int x0 = cx - r;
     int x1 = cx + r;
     int x = x1;
-    int y0, y1;
+    float y0, y1;
     int dx;
 
     while(x0 <= x1){
         dx = x - x0;
-        y0 = cy + sqrt(pow(r, 2) - pow((x0 - cx), 2));
-        horizontale(x0, y0, dx);
+        y0 = cy + sqrt((r * r) - (x0 - cx) * (x0 - cx));
+        y1 = cy - sqrt((r*r) - (x0 - cx)*(x0-cx));
 
-        y1 = cy - sqrt(pow(r, 2) - pow((x0 - cx), 2));
-        horizontale(x0, y1, dx);
+        verticale(x0, y0, y1);
+
         x0++;
         x--;
     }

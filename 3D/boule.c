@@ -1,15 +1,39 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <SDL2/SDL.h>
-#include <math.h>
 #include <time.h>
 
-#define N 3
+#define N 8
 #define WIDTH 1500
 #define HEIGHT 1000
 
 SDL_Window *window;
 SDL_Renderer *renderer;
+
+struct Cercle{
+    int cx, cy, cz, r;
+};
+
+struct Oeil
+{
+    int ox,oy,oz;
+};
+
+struct Lumiere{
+    int lx,ly,lz;
+};
+
+struct Equation{
+    int x, y, z, e;
+    float tq;
+};
+
+struct Cercle boule = {1000,1000,400,200};
+struct Lumiere l = {1000,1000,500};
+struct Oeil o = {250,250,-500};
+struct Equation eq[N];
+struct Cercle cercle;
+
 
 void quit(){
     if (renderer != NULL)
@@ -18,8 +42,6 @@ void quit(){
         SDL_DestroyWindow(window);
     SDL_Quit();
 }
-
-SDL_Point points[N];
 
 int Round(float x){
     return (int)(x + 0.5);
@@ -44,42 +66,42 @@ void verticale (int x0, int y0, int y1){
     }    
 }
 
-void cercle(int cx, int cy , int r){
-    int x0 = cx - r;
-    int x1 = cx + r;
-    float y0, y1;
-    float y00 = cy, y11 = cy; //y00, y11 nous serviront à lier chaque point d cercle à celui qui le suit
-    while (x0 <= x1)
+void projection(struct Oeil o){
+    
+    for (int i = 0; i < N; i++)
     {
-        y0 = cy + sqrt((r * r) - (x0 - cx) * (x0 - cx));
-        //SDL_RenderDrawPoint(renderer, x0, Round(y0));
-        verticale(x0, Round(y0), Round(y00));
-        y00 = y0;
+        eq[i].x = boule.cx - o.ox;
+        eq[i].y = boule.cy - o.oy;
+        eq[i].z = boule.cz - o.oz;
 
-        y1 = cy - sqrt((r * r) - (x0 - cx) * (x0 - cx));
-        //SDL_RenderDrawPoint(renderer, x0, Round(y1));
-        verticale(x0, Round(y1), Round(y11));
-        y11 = y1;
+        eq[i].tq = (float)-o.oz/(float)eq[i].z;
 
-        SDL_RenderPresent(renderer);
-        x0++;
+        cercle.cx = eq[i].tq * eq[i].x + o.ox;
+        cercle.cy = eq[i].tq * eq[i].y + o.oy;
     }
 }
 
-void disque(int cx, int cy , int r){
-    int x0 = cx - r;
-    int x1 = cx + r;
+void rayon(){
+    float oc1, oc2;
+    oc1 = sqrt((boule.cx - o.ox) * (boule.cx - o.ox) + (boule.cy - o.oy) * (boule.cy - o.oy) + (boule.cz - o.oz) * (boule.cz - o.oz));
+    oc2 = sqrt((boule.cx - o.ox) * (boule.cx - o.ox) + (boule.cy - o.oy) * (boule.cy - o.oy));
+
+    cercle.r = boule.r * oc2 / oc1;
+}
+
+void disque(){
+    int x0 = cercle.cx - cercle.r;
+    int x1 = cercle.cx + cercle.r;
     int x = x1;
     float y0, y1;
     int dx;
 
     while(x0 <= x1){
         dx = x - x0;
-        y0 = cy + sqrt((r * r) - (x0 - cx) * (x0 - cx));
-        y1 = cy - sqrt((r * r) - (x0 - cx)  *(x0 - cx));
+        y0 = cercle.cy + sqrt((cercle.r * cercle.r) - (x0 - cercle.cx) * (x0 - cercle.cx));
+        y1 = cercle.cy - sqrt((cercle.r * cercle.r) - (x0 - cercle.cx) * (x0 - cercle.cx));
 
         verticale(x0, y0, y1);
-
         x0++;
         x--;
     }
@@ -115,20 +137,23 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    points[0].x = 400;
-    points[0].y = 400;
+    struct Oeil o = {250,250,-300};
+        projection(o);
+        rayon();
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        printf("disque : cx = %d, cy = %d, r = %d\n", cercle.cx, cercle.cy, cercle.r);
+        disque();
+        SDL_RenderPresent(renderer);
 
-    cercle(points[0].x, points[0].y, 200);
-    disque(points[0].x+200, points[0].y+200, 100);
+        SDL_Event event;
+        SDL_bool quitter = SDL_FALSE;
 
-    SDL_RenderPresent(renderer);
-
-    SDL_Event event;
-    SDL_bool quitter = SDL_FALSE;
-
-    while(!quitter){
-        while (SDL_WaitEvent(&event)){
-            switch(event.type){
+        while (!quitter)
+        {
+            while (SDL_WaitEvent(&event))
+            {
+                switch (event.type)
+                {
                 case SDL_KEYDOWN:
                 switch (event.key.keysym.sym) {
                     case SDLK_a:
