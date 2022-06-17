@@ -324,8 +324,8 @@ void centre(){
         v.x = face[i][2].x - face[i][3].x;
         v.y = face[i][2].y - face[i][3].y;
 
-        normal[i].x =.x =
-            normal[i].y =
+        normal[i].x = .x 
+        normal[i].y =
     }
 }*/
 
@@ -375,12 +375,12 @@ int main(int argc, char *argv[])
     {
         for (int j = 0; j < PNT; j++)
         {
-            if (j == PNT - 1)
+            if (j == PNT - 1){
                 SDL_RenderDrawPoint(renderer, face[i][j].x, face[0][0].y);
-            else 
+            }
+            else {
                 SDL_RenderDrawPoint(renderer, face[i][j].x, face[i][j].y);
-
-            SDL_RenderPresent(renderer);
+            }
         }
     }
     for (int i = 0; i < POL; i++)
@@ -388,10 +388,12 @@ int main(int argc, char *argv[])
         for (int j = 0; j < PNT; j++)
         {
             if (j==PNT-1)
+            {
                 algoNaif(face[i][j].x, face[i][j].y, face[i][0].x, face[i][0].y);
-            else
+            }
+            else{
                 algoNaif(face[i][j].x, face[i][j].y, face[i][j+1].x, face[i][j+1].y);
-            SDL_RenderPresent(renderer);
+            }
         }
     }
     /*Polygones parallelepipede*/
