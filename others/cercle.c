@@ -21,6 +21,8 @@ void quit(){
 
 SDL_Point points[N];
 
+float y00, y11;
+
 int Round(float x){
     return (int)(x + 0.5);
 }
@@ -32,6 +34,7 @@ void horizontale (int x0, int y0, int dx){
         for (int i = x0; i <= x; i++)
         {
             SDL_RenderDrawPoint(renderer, i, y0);
+            //SDL_RenderPresent(renderer);
         }
     }
     else {
@@ -39,22 +42,24 @@ void horizontale (int x0, int y0, int dx){
         for (int i = x0; i >= x; i--)
         {
             SDL_RenderDrawPoint(renderer, i, y0);
+            //SDL_RenderPresent(renderer);
         }
     }  
 }
 
-void verticale (int x0, int y0, int dy){
+void verticale (int x0, int y0, int y1){
     int i, x, y;
-    if (dy > 0){
-        y = dy + y0;
-        for (i = y0; i <= y; i++)
+    int dy = y1 - y0;
+    if (dy > 0)
+    {
+        for (i = y0; i <= y1; i++)
         {
             SDL_RenderDrawPoint(renderer, x0, i);
         }
     }
     else{
         y = y0 + dy;
-        for (i = y0; i >= y; i--)
+        for (i = y0; i >= y1; i--)
         {
             SDL_RenderDrawPoint(renderer, x0, i);
         }
@@ -64,15 +69,22 @@ void verticale (int x0, int y0, int dy){
 void cercle(int cx, int cy , int r){
     int x0 = cx - r;
     int x1 = cx + r;
-    int y0, y1;
+    float y0, y1;
+    y00 = cy;
+    y11 = cy;
+    while (x0 <= x1)
+    {
+        y0 = cy + sqrt((r * r) - (x0 - cx) * (x0 - cx));
+        //SDL_RenderDrawPoint(renderer, x0, Round(y0));
+        verticale(x0, Round(y0), Round(y00));
+        y00 = y0;
 
-    while(x0 <= x1){
-        y0 = cy + sqrt(pow(r, 2) - pow((x0 - cx), 2));
-        SDL_RenderDrawPoint(renderer, x0, Round(y0));
+        y1 = cy - sqrt((r*r) - (x0 - cx)*(x0-cx));
+        //SDL_RenderDrawPoint(renderer, x0, Round(y1));
+        verticale(x0, Round(y1), Round(y11));
+        y11 = y1;
 
-        y1 = cy - sqrt(pow(r, 2) - pow((x0 - cx), 2));
-        SDL_RenderDrawPoint(renderer, x0, Round(y1));
-
+        SDL_RenderPresent(renderer);
         x0++;
     }
 }
@@ -81,16 +93,16 @@ void disque(int cx, int cy , int r){
     int x0 = cx - r;
     int x1 = cx + r;
     int x = x1;
-    int y0, y1;
+    float y0, y1;
     int dx;
 
     while(x0 <= x1){
         dx = x - x0;
         y0 = cy + sqrt(pow(r, 2) - pow((x0 - cx), 2));
-        horizontale(x0, y0, dx);
-
         y1 = cy - sqrt(pow(r, 2) - pow((x0 - cx), 2));
-        horizontale(x0, y1, dx);
+
+        verticale(x0, y0, y1);
+
         x0++;
         x--;
     }

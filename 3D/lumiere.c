@@ -329,22 +329,17 @@ void vNormal(){
             face[i][0].nx = 1;
         else if (face[i][0].nx < 0)
             face[i][0].nx = -1;
-        else
-            face[i][0].nx = 0;
 
         if (face[i][0].ny > 0)
             face[i][0].ny = 1;
         else if (face[i][0].ny < 0)
             face[i][0].ny = -1;
-        else
-            face[i][0].ny = 0;
 
         if (face[i][0].nz > 0)
             face[i][0].nz = 1;
         else if (face[i][0].nz < 0)
             face[i][0].nz -1;
-        else
-            face[i][0].nz = 0;
+
     }
 }
 
