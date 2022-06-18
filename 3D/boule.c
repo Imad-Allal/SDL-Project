@@ -20,13 +20,18 @@ struct Point
     int x,y,z;
 };
 
+struct PntAdv
+{
+    float x,y,z,n,a;
+};
+
 struct Equation{
     int x, y, z, e;
     float tq;
 };
 
 struct Cercle boule = {1000,1000,400,200};
-struct Point l = {1000,1000,500};
+struct Point l = {1000,100,500};
 struct Point o = {250,250,-500};
 struct Equation eq[N];
 struct Cercle cercle;
@@ -44,7 +49,7 @@ int Round(float x){
     return (int)(x + 0.5);
 }
 
-void projection(struct Point p[2]){
+void projection(struct PntAdv p[2]){
     
     for (int i = 0; i < 2; i++)
     {
@@ -57,14 +62,19 @@ void projection(struct Point p[2]){
         p[i].x = eq[i].tq * eq[i].x + o.x;
         p[i].y = eq[i].tq * eq[i].y + o.y;
 
-        SDL_RenderDrawPoint(renderer, p[i].x, p[i].y);
+        if (p[i].a > 0){
+            SDL_SetRenderDrawColor(renderer, p[i].a * 255, p[i].a * 255, p[i].a * 255, 255);
+            SDL_RenderDrawPoint(renderer, p[i].x, p[i].y);
+        }
     }
 }
-
 void intersection(int px, int py, int pz){
-    float a, b, c, t0, t1;
+    float a, b, c, t0, t1, alpha0, alpha1;
     struct Point e;
-    struct Point p[2];
+    struct PntAdv p[2];
+    struct PntAdv pl;
+    struct PntAdv cp[2];
+    
     e.x = px - o.x;
     e.y = py - o.y;
     e.z = pz - o.z; // a verifier
@@ -90,8 +100,28 @@ void intersection(int px, int py, int pz){
     p[1].y = t1 * e.y + o.y;
     p[1].z = t1 * e.z + o.z;
 
-    //printf("p0 : %d, %d, %d\n", p[0].x, p[0].y, p[0].z);
-    //printf("p1 : %d, %d, %d\n", p[1].x, p[1].y, p[1].z);
+    pl.x = l.x - px;
+    pl.y = l.y - py;
+    pl.z = l.z - pz;
+
+    pl.n = sqrt((pl.x * pl.x) + (pl.y * pl.y) + (pl.z * pl.z));
+
+    cp[0].x = p[0].x - boule.cx;
+    cp[0].y = p[0].y - boule.cy;
+    cp[0].z = p[0].z - boule.cz;
+
+    cp[1].x = p[1].x - boule.cx;
+    cp[1].y = p[1].y - boule.cy;
+    cp[1].z = p[1].z - boule.cz;
+
+    cp[0].n = sqrt((cp[0].x * cp[0].x) + (cp[0].y * cp[0].y) + (cp[0].z * cp[0].z));
+    cp[1].n = sqrt((cp[1].x * cp[1].x) + (cp[1].y * cp[1].y) + (cp[1].z * cp[1].z));
+
+    p[0].a = (pl.x * cp[0].x + pl.y * cp[0].y + pl.z * cp[0].z) / (pl.n * cp[0].n);
+    p[1].a = (pl.x * cp[1].x + pl.y * cp[1].y + pl.z * cp[1].z) / (pl.n * cp[1].n);
+
+    //printf("alpha0 : %f\n", p[0].a);
+    //printf("alpha1 : %f\n", p[1].a);
 
     projection(p);
 }
@@ -105,8 +135,6 @@ void verticale (int x0, int y0, int y1, int z){
         for (i = y0; i <= y1; i++)
         {
             //printf("x0 : %d, y0 : %d\n", x0, i);
-            SDL_RenderDrawPoint(renderer, x0, i);
-            SDL_RenderPresent(renderer);
             intersection(x0, i, z);
         }
     }
@@ -119,22 +147,6 @@ void verticale (int x0, int y0, int y1, int z){
         }
     }    
 }
-/*
-void projection(){
-    
-    for (int i = 0; i < N; i++)
-    {
-        eq[i].x = boule.cx - o.x;
-        eq[i].y = boule.cy - o.y;
-        eq[i].z = boule.cz - o.z;
-
-        eq[i].tq = (float)-o.z/(float)eq[i].z;
-
-        cercle.cx = eq[i].tq * eq[i].x + o.x;
-        cercle.cy = eq[i].tq * eq[i].y + o.y;
-    }
-}
-*/
 
 void rayon(){
     float oc1, oc2;
