@@ -79,6 +79,7 @@ void disque(int cx, int cy , int r){
         y1 = cy - sqrt((r * r) - (x0 - cx)  *(x0 - cx));
 
         verticale(x0, y0, y1);
+        SDL_RenderPresent(renderer);
 
         x0++;
         x--;
