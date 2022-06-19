@@ -12,7 +12,7 @@ SDL_Window *window;
 SDL_Renderer *renderer;
 
 struct Cercle{
-    int cx, cy, cz, r;
+    float cx, cy, cz, r;
 };
 
 struct Point
@@ -30,8 +30,8 @@ struct Equation{
     float tq;
 };
 
-struct Cercle boule = {300,1000,400,400};
-struct Point l = {1000,1500,500};
+struct Cercle boule = {300,1000,400,300};
+struct Point l = {250,900,1000};
 struct Point o = {250,250,-500};
 struct Equation eq[N];
 struct Cercle cercle;
@@ -51,7 +51,7 @@ int Round(float x){
 
 void projection(struct PntAdv p[2]){ // Ajoute(projette) de la lumiere au disque 2D
     
-    for (int i = 0; i < 2; i++)
+    for (int i = 0; i < 1; i++)
     {
         eq[i].x = p[i].x - o.x;
         eq[i].y = p[i].y - o.y;
@@ -61,10 +61,14 @@ void projection(struct PntAdv p[2]){ // Ajoute(projette) de la lumiere au disque
 
         p[i].x = eq[i].tq * eq[i].x + o.x;
         p[i].y = eq[i].tq * eq[i].y + o.y;
-                if (p[i].a > 0){
-                    SDL_SetRenderDrawColor(renderer, p[i].a * 255, p[i].a * 255, p[i].a * 255, p[i].a*255);
-                    SDL_RenderDrawPoint(renderer, Round(p[i].x), Round(p[i].y));
-                }
+        if (p[0].a > 0)
+        {
+            SDL_SetRenderDrawColor(renderer, p[0].a * 255, p[0].a * 255, p[0].a * 255, 255);
+            SDL_RenderDrawPoint(renderer, Round(p[0].x), Round(p[0].y));
+        }
+        else 
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+            SDL_RenderDrawPoint(renderer, Round(p[i].x), Round(p[i].y));
     }
 }
 
@@ -180,10 +184,10 @@ void rayon(){
 }
 
 void disque(struct Cercle sphere){
-    int x0 = sphere.cx - sphere.r;
-    int x1 = sphere.cx + sphere.r;
-    int x = x1;
+    float x0 = sphere.cx - sphere.r;
+    float x1 = sphere.cx + sphere.r;
     float y0, y1;
+    float x = x1;
     int dx;
 
     while(x0 <= x1){
@@ -231,11 +235,10 @@ int main(int argc, char *argv[])
     SDL_SetRenderDrawColor(renderer, 200, 200, 200, 255);
     SDL_RenderClear(renderer);
     rayon();
-    projet();
+    //projet();
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    disque(cercle);
-    SDL_RenderPresent(renderer);
-    SDL_Delay(1000);
+    printf("Rayon de cercle : %f\nCoordonnées : Cx = %f, Cy = %f\n", cercle.r, cercle.cx, cercle.cy);
+    //disque(cercle);
     disque(boule);
     SDL_RenderPresent(renderer);
     SDL_Event event;
