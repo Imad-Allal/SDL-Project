@@ -12,29 +12,31 @@ SDL_Window *window;
 SDL_Renderer *renderer;
 
 struct Cercle{
-    float cx, cy, cz, r;
+    double cx, cy, cz, r;
 };
 
 struct Point
 {
-    int x,y,z;
+    double x,y,z;
 };
 
 struct PntAdv
 {
-    float x,y,z,n,a;
+    double x,y,z,n,a;
 };
 
 struct Equation{
     int x, y, z, e;
-    float tq;
+    double tq;
 };
 
-struct Cercle boule = {300,1000,400,300};
-struct Point l = {250,900,1000};
+struct Cercle boule = {300,1000,400,200};
+struct Point l = {100,100,300};
 struct Point o = {250,250,-500};
 struct Equation eq[N];
 struct Cercle cercle;
+struct PntAdv p[2];
+
 
 
 void quit(){
@@ -49,29 +51,6 @@ int Round(float x){
     return (int)(x + 0.5);
 }
 
-void projection(struct PntAdv p[2]){ // Ajoute(projette) de la lumiere au disque 2D
-    
-    for (int i = 0; i < 1; i++)
-    {
-        eq[i].x = p[i].x - o.x;
-        eq[i].y = p[i].y - o.y;
-        eq[i].z = p[i].z - o.z;
-
-        eq[i].tq = (float)-o.z/(float)eq[i].z;
-
-        p[i].x = eq[i].tq * eq[i].x + o.x;
-        p[i].y = eq[i].tq * eq[i].y + o.y;
-        if (p[0].a > 0)
-        {
-            SDL_SetRenderDrawColor(renderer, p[0].a * 255, p[0].a * 255, p[0].a * 255, 255);
-            SDL_RenderDrawPoint(renderer, Round(p[0].x), Round(p[0].y));
-        }
-        else 
-            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-            SDL_RenderDrawPoint(renderer, Round(p[i].x), Round(p[i].y));
-    }
-}
-
 void projet(){ // Porjette la sphere 3D en un disque 2D noire
     
     for (int i = 0; i < 2; i++)
@@ -80,31 +59,37 @@ void projet(){ // Porjette la sphere 3D en un disque 2D noire
         eq[i].y = boule.cy - o.y;
         eq[i].z = boule.cz - o.z;
 
-        eq[i].tq = (float)-o.z/(float)eq[i].z;
+        eq[i].tq = (double)-o.z/(double)eq[i].z;
 
         cercle.cx = eq[i].tq * eq[i].x + o.x;
         cercle.cy = eq[i].tq * eq[i].y + o.y;
     }
 }
-void intersection(float px, float py, int pz){ //L'intersection de OP avec la boule
-    float a, b, c, rac, t0, t1;
-    struct Point e;
+int intersection(double px, double py, double pz){ //L'intersection de OP avec la boule
+    double a, b, c, rac, t0, t1;
+    struct PntAdv cp[2];
     struct PntAdv p[2];
     struct PntAdv pl;
-    struct PntAdv cp[2];
+    struct Point e;
     
+    //Calcul de vecteur OP
     e.x = px - o.x;
     e.y = py - o.y;
-    e.z = pz - o.z;
+    e.z = 0 - o.z;
+    //printf("e : %f ,%f ,%f\n", e.x, e.y, e.z);
+    // Calcul de vecteur OP
 
+    //Calcul des valeurs de a, b ,c
     a = e.x*e.x + e.y*e.y + e.z*e.z;
     b = 2 * e.x * (o.x - boule.cx) + 2 * e.y * (o.y - boule.cy) + 2 * e.z * (o.z - boule.cz);
     c = (o.x - boule.cx) * (o.x - boule.cx) + (o.y - boule.cy) * (o.y - boule.cy) + (o.z - boule.cz) * (o.z - boule.cz) - (boule.r * boule.r);
+    //printf("a : %f, b : %f, c : %f\n", a, b, c);
 
-    rac = sqrt((b * b) - (4 * a * c));
-
-    t0 = (-b+rac)/(2 * a);
+    rac = sqrt(b * b - 4 * a * c);
+    //printf("rac : %f\n", rac);
+    t0 = (-b + rac) / (2 * a);
     t1 = (-b-rac)/(2 * a);
+    //printf("t0 = %f, t1 = %f\n", t0, t1);
 
     p[0].x = t0 * e.x + o.x;
     p[0].y = t0 * e.y + o.y;
@@ -120,6 +105,8 @@ void intersection(float px, float py, int pz){ //L'intersection de OP avec la bo
 
     pl.n = sqrt((pl.x * pl.x) + (pl.y * pl.y) + (pl.z * pl.z));
 
+    //printf("p.x = %f, p.y = %f, p.z = %f, p.n = %f\n", p[0].x, p[0].y, p[0].z);
+
     cp[0].x = p[0].x - boule.cx;
     cp[0].y = p[0].y - boule.cy;
     cp[0].z = p[0].z - boule.cz;
@@ -133,18 +120,28 @@ void intersection(float px, float py, int pz){ //L'intersection de OP avec la bo
 
     p[0].a = ((pl.x * cp[0].x) + (pl.y * cp[0].y) + (pl.z * cp[0].z)) / (pl.n * cp[0].n);
     p[1].a = ((pl.x * cp[1].x) + (pl.y * cp[1].y) + (pl.z * cp[1].z)) / (pl.n * cp[1].n);
+    //printf("cp.x = %f, cp.y = %f, cp.z = %f, cp.n = %f\n", cp[0].x, cp[0].y, cp[0].z, cp[0].n);
 
-    projection(p);
+    if (p[0].a > 0){
+        SDL_SetRenderDrawColor(renderer, p[0].a*255, p[0].a*255, p[0].a*255, 255);
+        SDL_RenderDrawPoint(renderer, px, py);
+    }
+    if (p[1].a > 0){
+        SDL_SetRenderDrawColor(renderer, p[1].a*255, p[1].a*255, p[1].a*255, 255);
+        SDL_RenderDrawPoint(renderer, px, py);
+    }
+
+    //printf("a1 = %lf, a2 = %lf\n", p[0].a, p[1].a);
 }
 
-void ombre (float x0, float y0, float y1, int z){
+void ombre (double x0, double y0, double y1, int z){
     int i, x, y;
     int dy = y1 - y0;
     if (dy > 0)
     {
         for (i = y0; i <= y1; i++)
         {
-            intersection(x0, i, z);
+            intersection(x0, i, z); // Calcule l'intersection de chaque point (x, y) du cercle
         }
     }
     else{
@@ -155,13 +152,13 @@ void ombre (float x0, float y0, float y1, int z){
         }
     }    
 }
-void verticale (float x0, float y0, float y1){
+void verticale (double x0, double y0, double y1){
     //printf("VERTICAAAALE\n");
     int i, x, y;
     int dy = y1 - y0;
     if (dy > 0)
     {
-        for (float i = y0; i <= y1; i++)
+        for (i = y0; i <= y1; i++)
         {
             SDL_RenderDrawPoint(renderer,x0, Round(i));
         }
@@ -176,7 +173,7 @@ void verticale (float x0, float y0, float y1){
 }
 
 void rayon(){
-    float oc1, oc2;
+    double oc1, oc2;
     oc1 = sqrt((boule.cx - o.x) * (boule.cx - o.x) + (boule.cy - o.y) * (boule.cy - o.y) + (boule.cz - o.z) * (boule.cz - o.z));
     oc2 = sqrt((boule.cx - o.x) * (boule.cx - o.x) + (boule.cy - o.y) * (boule.cy - o.y));
 
@@ -184,22 +181,31 @@ void rayon(){
 }
 
 void disque(struct Cercle sphere){
-    float x0 = sphere.cx - sphere.r;
-    float x1 = sphere.cx + sphere.r;
-    float y0, y1;
-    float x = x1;
+    double x0 = sphere.cx - sphere.r;
+    double x1 = sphere.cx + sphere.r;
+    double y0, y1;
+    double x = x1;
     int dx;
 
     while(x0 <= x1){
         dx = x - x0;
         y0 = sphere.cy + sqrt((sphere.r * sphere.r) - (x0 - sphere.cx) * (x0 - sphere.cx));
         y1 = sphere.cy - sqrt((sphere.r * sphere.r) - (x0 - sphere.cx) * (x0 - sphere.cx));
-        if (sphere.r == cercle.r)
-            verticale(x0, y0, y1);
-        else
-            ombre(x0, y0, y1, sphere.cz);
+        verticale(x0, y0, y1); // Trace une ligne verticale
         x0++;
         x--;
+    }
+}
+void point(struct Cercle sphere){
+    int x0 = sphere.cx - sphere.r;
+    int x1 = sphere.cx + sphere.r;
+    double y0, y1;
+
+    while(x0 <= x1){
+        y0 = sphere.cy + sqrt((sphere.r * sphere.r) - (x0 - sphere.cx) * (x0 - sphere.cx));
+        y1 = sphere.cy - sqrt((sphere.r * sphere.r) - (x0 - sphere.cx) * (x0 - sphere.cx));
+        ombre(x0, y0, y1, boule.cz); // Prend les 2 extrémités (hautes et basses) de chaque point x du cercle, et calcul l'ombre de tous les points entre y0 et y1
+        x0++;
     }
 }
 
@@ -227,19 +233,18 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    if (SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255) != 0) {    
+    if (SDL_SetRenderDrawColor(renderer, 200, 200, 200, 255) != 0) {    
         fprintf(stderr,"Color error %s", SDL_GetError());
         quit();
         return EXIT_FAILURE;
     }
-    SDL_SetRenderDrawColor(renderer, 200, 200, 200, 255);
     SDL_RenderClear(renderer);
-    rayon();
-    //projet();
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    printf("Rayon de cercle : %f\nCoordonnées : Cx = %f, Cy = %f\n", cercle.r, cercle.cx, cercle.cy);
-    //disque(cercle);
-    disque(boule);
+
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); 
+    projet(); // Projection du centre de la sphere
+    rayon(); // Calcul du rayon du cercle
+    disque(cercle); // Dessin de disque noire (avant raytracing)
+    point(cercle); // Calcul la luminausité de chaque point du cercle de centre C', rayon R'
     SDL_RenderPresent(renderer);
     SDL_Event event;
     SDL_bool quitter = SDL_FALSE;
