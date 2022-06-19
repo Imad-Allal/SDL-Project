@@ -30,7 +30,7 @@ struct Equation{
     float tq;
 };
 
-struct Cercle boule = {1000,1000,400,200};
+struct Cercle boule = {300,1000,400,400};
 struct Point l = {1000,1500,500};
 struct Point o = {250,250,-500};
 struct Equation eq[N];
@@ -49,7 +49,7 @@ int Round(float x){
     return (int)(x + 0.5);
 }
 
-void projection(struct PntAdv p[2]){
+void projection(struct PntAdv p[2]){ // Ajoute(projette) de la lumiere au disque 2D
     
     for (int i = 0; i < 2; i++)
     {
@@ -62,12 +62,27 @@ void projection(struct PntAdv p[2]){
         p[i].x = eq[i].tq * eq[i].x + o.x;
         p[i].y = eq[i].tq * eq[i].y + o.y;
                 if (p[i].a > 0){
-                    SDL_SetRenderDrawColor(renderer, p[i].a * 255, p[i].a * 255, p[i].a * 255, 255);
+                    SDL_SetRenderDrawColor(renderer, p[i].a * 255, p[i].a * 255, p[i].a * 255, p[i].a*255);
                     SDL_RenderDrawPoint(renderer, Round(p[i].x), Round(p[i].y));
                 }
     }
 }
-void intersection(float px, float py, int pz){
+
+void projet(){ // Porjette la sphere 3D en un disque 2D noire
+    
+    for (int i = 0; i < 2; i++)
+    {
+        eq[i].x = boule.cx - o.x;
+        eq[i].y = boule.cy - o.y;
+        eq[i].z = boule.cz - o.z;
+
+        eq[i].tq = (float)-o.z/(float)eq[i].z;
+
+        cercle.cx = eq[i].tq * eq[i].x + o.x;
+        cercle.cy = eq[i].tq * eq[i].y + o.y;
+    }
+}
+void intersection(float px, float py, int pz){ //L'intersection de OP avec la boule
     float a, b, c, rac, t0, t1;
     struct Point e;
     struct PntAdv p[2];
@@ -118,8 +133,7 @@ void intersection(float px, float py, int pz){
     projection(p);
 }
 
-void verticale (float x0, float y0, float y1, int z){
-    //printf("VERTICAAAALE\n");
+void ombre (float x0, float y0, float y1, int z){
     int i, x, y;
     int dy = y1 - y0;
     if (dy > 0)
@@ -137,6 +151,25 @@ void verticale (float x0, float y0, float y1, int z){
         }
     }    
 }
+void verticale (float x0, float y0, float y1){
+    //printf("VERTICAAAALE\n");
+    int i, x, y;
+    int dy = y1 - y0;
+    if (dy > 0)
+    {
+        for (float i = y0; i <= y1; i++)
+        {
+            SDL_RenderDrawPoint(renderer,x0, Round(i));
+        }
+    }
+    else{
+        y = y0 + dy;
+        for (i = y0; i >= y1; i--)
+        {
+            SDL_RenderDrawPoint(renderer,x0, Round(i));
+        }
+    }    
+}
 
 void rayon(){
     float oc1, oc2;
@@ -146,18 +179,21 @@ void rayon(){
     cercle.r = boule.r * oc2 / oc1;
 }
 
-void disque(struct Cercle cercle){
-    int x0 = cercle.cx - cercle.r;
-    int x1 = cercle.cx + cercle.r;
+void disque(struct Cercle sphere){
+    int x0 = sphere.cx - sphere.r;
+    int x1 = sphere.cx + sphere.r;
     int x = x1;
     float y0, y1;
     int dx;
 
     while(x0 <= x1){
         dx = x - x0;
-        y0 = cercle.cy + sqrt((cercle.r * cercle.r) - (x0 - cercle.cx) * (x0 - cercle.cx));
-        y1 = cercle.cy - sqrt((cercle.r * cercle.r) - (x0 - cercle.cx) * (x0 - cercle.cx));
-        verticale(x0, y0, y1, cercle.cz);
+        y0 = sphere.cy + sqrt((sphere.r * sphere.r) - (x0 - sphere.cx) * (x0 - sphere.cx));
+        y1 = sphere.cy - sqrt((sphere.r * sphere.r) - (x0 - sphere.cx) * (x0 - sphere.cx));
+        if (sphere.r == cercle.r)
+            verticale(x0, y0, y1);
+        else
+            ombre(x0, y0, y1, sphere.cz);
         x0++;
         x--;
     }
@@ -192,22 +228,26 @@ int main(int argc, char *argv[])
         quit();
         return EXIT_FAILURE;
     }
+    SDL_SetRenderDrawColor(renderer, 200, 200, 200, 255);
+    SDL_RenderClear(renderer);
+    rayon();
+    projet();
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    disque(cercle);
+    SDL_RenderPresent(renderer);
+    SDL_Delay(1000);
+    disque(boule);
+    SDL_RenderPresent(renderer);
+    SDL_Event event;
+    SDL_bool quitter = SDL_FALSE;
 
-        rayon();
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        disque(boule);
-        SDL_RenderPresent(renderer);
-
-        SDL_Event event;
-        SDL_bool quitter = SDL_FALSE;
-
-        while (!quitter)
+    while (!quitter)
+    {
+        while (SDL_WaitEvent(&event))
         {
-            while (SDL_WaitEvent(&event))
+            switch (event.type)
             {
-                switch (event.type)
-                {
-                case SDL_KEYDOWN:
+            case SDL_KEYDOWN:
                 switch (event.key.keysym.sym) {
                     case SDLK_a:
                         printf("Vous avez demandé à quitter le programme\n");
