@@ -4,7 +4,7 @@
 #include <time.h>
 
 #define N 8
-#define POL 6
+#define POL 5
 #define PNT 4
 #define WIDTH 1500
 #define HEIGHT 1000
@@ -35,20 +35,28 @@ struct Equation{
     float tq;
 };
 
-struct Face face[6][4];
-
-struct Prl p1[N] = {
-    {400, 400, 400},
-    {800, 400, 400},
-    {800, 800, 400},
-    {400, 800, 400},
-
-    {400, 400, 800},
-    {800, 400, 800},
-    {800, 800, 800},
-    {400, 800, 800}
+struct Cercle{
+    double cx, cy, cz, r;
 };
 
+struct Point
+{
+    double x,y,z;
+};
+
+struct PntAdv
+{
+    double x,y,z,n,a;
+};
+
+struct Cercle boule = {300,1000,400,200};
+struct Point l = {100,100,300};
+struct Point o = {250,250,-500};
+struct Equation eq[N];
+struct Cercle cercle;
+struct PntAdv p[2];
+
+struct Face face[6][4];
 struct Equation eq[N];
 struct Prl q[N];
 struct Lumiere cl[N];
@@ -232,82 +240,56 @@ void remplirPolygone(int xmin, int xmax, int index){
         cpt2++;
 
         verticale(x, y0, y1);
-        SDL_RenderPresent(renderer);
         x++;
     }
 }
 
-void polygones(struct Prl p[8]){
-    int j = 4;
-    for (int i = 0; i < PNT; i++)
-    {
-        face[0][i].x = p[j].px;
-        face[0][i].y = p[j].py;
-        face[0][i].z = p[j].pz;
-        j++;
-    }
+void polygones(){
 
-    face[1][0].x = p[7].px;
-    face[1][0].y = p[7].py;
-    face[1][0].z = p[7].pz;
-    face[1][1].x = p[6].px;
-    face[1][1].y = p[6].py;
-    face[1][1].z = p[6].pz;
-    face[1][2].x = p[2].px;
-    face[1][2].y = p[2].py;
-    face[1][2].z = p[2].pz;
-    face[1][3].x = p[3].px;
-    face[1][3].y = p[3].py;
-    face[1][3].z = p[3].pz;
+    face[0][0].x = 0;
+    face[0][0].y = 0;
+    face[0][1].x = 1500;
+    face[0][1].y = 0;
+    face[0][2].x = 1500;
+    face[0][2].y = 1000;
+    face[0][3].x = 0;
+    face[0][3].y = 1000;
 
-    face[2][0].x = p[1].px;
-    face[2][0].y = p[1].py;
-    face[2][0].z = p[1].pz;
-    face[2][1].x = p[5].px;
-    face[2][1].y = p[5].py;
-    face[2][1].z = p[5].pz;
-    face[2][2].x = p[6].px;
-    face[2][2].y = p[6].py;
-    face[2][2].z = p[6].pz;
-    face[2][3].x = p[2].px;
-    face[2][3].y = p[2].py;
-    face[2][3].z = p[2].pz;
+    face[1][0].x = 0;
+    face[1][0].y = 0;
+    face[1][1].x = 1500;
+    face[1][1].y = 0;
+    face[1][2].x = 1000;
+    face[1][2].y = 400;
+    face[1][3].x = 500;
+    face[1][3].y = 400;
+
+    face[2][0].x = 0;
+    face[2][0].y = 0;
+    face[2][1].x = 500;
+    face[2][1].y = 400;
+    face[2][2].x = 500;
+    face[2][2].y = 600;
+    face[2][3].x = 0;
+    face[2][3].y = 1000;
     
-    face[3][0].x = p[4].px;
-    face[3][0].y = p[4].py;
-    face[3][0].z = p[4].pz;
-    face[3][1].x = p[5].px;
-    face[3][1].y = p[5].py;
-    face[3][1].z = p[5].pz;
-    face[3][2].x = p[1].px;
-    face[3][2].y = p[1].py;
-    face[3][2].z = p[1].pz;
-    face[3][3].x = p[0].px;
-    face[3][3].y = p[0].py;
-    face[3][3].z = p[0].pz;
+    face[3][0].x = 0;
+    face[3][0].y = 1000;
+    face[3][1].x = 500;
+    face[3][1].y = 600;
+    face[3][2].x = 1000;
+    face[3][2].y = 600;
+    face[3][3].x = 1500;
+    face[3][3].y = 1000;
 
-    face[4][0].x = p[0].px;
-    face[4][0].y = p[0].py;
-    face[4][0].z = p[0].pz;
-    face[4][1].x = p[4].px;
-    face[4][1].y = p[4].py;
-    face[4][1].z = p[4].pz;
-    face[4][2].x = p[7].px;
-    face[4][2].y = p[7].py;
-    face[4][2].z = p[7].pz;
-    face[4][3].x = p[3].px;
-    face[4][3].y = p[3].py;
-    face[4][3].z = p[3].pz;
-    
-
-    j = 0;
-    for (int i = 0; i < PNT; i++)
-    {
-        face[5][i].x = p[j].px;
-        face[5][i].y = p[j].py;
-        face[5][i].z = p[j].pz;
-        j++;
-    }
+    face[4][0].x = 1000;
+    face[4][0].y = 400;
+    face[4][1].x = 1500;
+    face[4][1].y = 0;
+    face[4][2].x = 1500;
+    face[4][2].y = 1000;
+    face[4][3].x = 1000;
+    face[4][3].y = 600;
 }
 
 void vNormal(){
@@ -370,18 +352,161 @@ void lumiere(struct Lumiere l){
     }
 }
 
-void projection(struct Oeil o){
+void projet(){ // Porjette la sphere 3D en un disque 2D noire
     
-    for (int i = 0; i < N; i++)
+    for (int i = 0; i < 2; i++)
     {
-        eq[i].x = p1[i].px - o.ox;
-        eq[i].y = p1[i].py - o.oy;
-        eq[i].z = p1[i].pz - o.oz;
+        eq[i].x = boule.cx - o.x;
+        eq[i].y = boule.cy - o.y;
+        eq[i].z = boule.cz - o.z;
 
-        eq[i].tq = (float)-o.oz/(float)eq[i].z;
+        eq[i].tq = (double)-o.z/(double)eq[i].z;
 
-        q[i].px = eq[i].tq * eq[i].x + o.ox;
-        q[i].py = eq[i].tq * eq[i].y + o.oy;
+        cercle.cx = eq[i].tq * eq[i].x + o.x;
+        cercle.cy = eq[i].tq * eq[i].y + o.y;
+    }
+}
+int intersection(double px, double py, double pz){ //L'intersection de OP avec la boule
+    double a, b, c, rac, t0, t1;
+    struct PntAdv cp[2];
+    struct PntAdv p[2];
+    struct PntAdv pl;
+    struct Point e;
+    
+    //Calcul de vecteur OP
+    e.x = px - o.x;
+    e.y = py - o.y;
+    e.z = 0 - o.z;
+    //printf("e : %f ,%f ,%f\n", e.x, e.y, e.z);
+    // Calcul de vecteur OP
+
+    //Calcul des valeurs de a, b ,c
+    a = e.x*e.x + e.y*e.y + e.z*e.z;
+    b = 2 * e.x * (o.x - boule.cx) + 2 * e.y * (o.y - boule.cy) + 2 * e.z * (o.z - boule.cz);
+    c = (o.x - boule.cx) * (o.x - boule.cx) + (o.y - boule.cy) * (o.y - boule.cy) + (o.z - boule.cz) * (o.z - boule.cz) - (boule.r * boule.r);
+    //printf("a : %f, b : %f, c : %f\n", a, b, c);
+
+    rac = sqrt(b * b - 4 * a * c);
+    //printf("rac : %f\n", rac);
+    t0 = (-b + rac) / (2 * a);
+    t1 = (-b-rac)/(2 * a);
+    //printf("t0 = %f, t1 = %f\n", t0, t1);
+
+    p[0].x = t0 * e.x + o.x;
+    p[0].y = t0 * e.y + o.y;
+    p[0].z = t0 * e.z + o.z;
+
+    p[1].x = t1 * e.x + o.x;
+    p[1].y = t1 * e.y + o.y;
+    p[1].z = t1 * e.z + o.z;
+
+    pl.x = l.x - px;
+    pl.y = l.y - py;
+    pl.z = l.z - pz;
+
+    pl.n = sqrt((pl.x * pl.x) + (pl.y * pl.y) + (pl.z * pl.z));
+
+    //printf("p.x = %f, p.y = %f, p.z = %f, p.n = %f\n", p[0].x, p[0].y, p[0].z);
+
+    cp[0].x = p[0].x - boule.cx;
+    cp[0].y = p[0].y - boule.cy;
+    cp[0].z = p[0].z - boule.cz;
+
+    cp[1].x = p[1].x - boule.cx;
+    cp[1].y = p[1].y - boule.cy;
+    cp[1].z = p[1].z - boule.cz;
+
+    cp[0].n = sqrt((cp[0].x * cp[0].x) + (cp[0].y * cp[0].y) + (cp[0].z * cp[0].z));
+    cp[1].n = sqrt((cp[1].x * cp[1].x) + (cp[1].y * cp[1].y) + (cp[1].z * cp[1].z));
+
+    p[0].a = ((pl.x * cp[0].x) + (pl.y * cp[0].y) + (pl.z * cp[0].z)) / (pl.n * cp[0].n);
+    p[1].a = ((pl.x * cp[1].x) + (pl.y * cp[1].y) + (pl.z * cp[1].z)) / (pl.n * cp[1].n);
+    //printf("cp.x = %f, cp.y = %f, cp.z = %f, cp.n = %f\n", cp[0].x, cp[0].y, cp[0].z, cp[0].n);
+
+    if (p[0].a > 0){
+        SDL_SetRenderDrawColor(renderer, p[0].a*255, p[0].a*255, p[0].a*255, 255);
+        SDL_RenderDrawPoint(renderer, px, py);
+    }
+    if (p[1].a > 0){
+        SDL_SetRenderDrawColor(renderer, p[1].a*255, p[1].a*255, p[1].a*255, 255);
+        SDL_RenderDrawPoint(renderer, px, py);
+    }
+
+    //printf("a1 = %lf, a2 = %lf\n", p[0].a, p[1].a);
+}
+
+void ombre (double x0, double y0, double y1, int z){
+    int i, x, y;
+    int dy = y1 - y0;
+    if (dy > 0)
+    {
+        for (i = y0; i <= y1; i++)
+        {
+            intersection(x0, i, z); // Calcule l'intersection de chaque point (x, y) du cercle
+        }
+    }
+    else{
+        y = y0 + dy;
+        for (i = y0; i >= y1; i--)
+        {
+            intersection(x0, i, z);
+        }
+    }    
+}
+void verticale2 (double x0, double y0, double y1){
+    //printf("VERTICAAAALE\n");
+    int i, x, y;
+    int dy = y1 - y0;
+    if (dy > 0)
+    {
+        for (i = y0; i <= y1; i++)
+        {
+            SDL_RenderDrawPoint(renderer,x0, Round(i));
+        }
+    }
+    else{
+        y = y0 + dy;
+        for (i = y0; i >= y1; i--)
+        {
+            SDL_RenderDrawPoint(renderer,x0, Round(i));
+        }
+    }    
+}
+
+void rayon(){
+    double oc1, oc2;
+    oc1 = sqrt((boule.cx - o.x) * (boule.cx - o.x) + (boule.cy - o.y) * (boule.cy - o.y) + (boule.cz - o.z) * (boule.cz - o.z));
+    oc2 = sqrt((boule.cx - o.x) * (boule.cx - o.x) + (boule.cy - o.y) * (boule.cy - o.y));
+
+    cercle.r = boule.r * oc2 / oc1;
+}
+
+void disque(struct Cercle sphere){
+    double x0 = sphere.cx - sphere.r;
+    double x1 = sphere.cx + sphere.r;
+    double y0, y1;
+    double x = x1;
+    int dx;
+
+    while(x0 <= x1){
+        dx = x - x0;
+        y0 = sphere.cy + sqrt((sphere.r * sphere.r) - (x0 - sphere.cx) * (x0 - sphere.cx));
+        y1 = sphere.cy - sqrt((sphere.r * sphere.r) - (x0 - sphere.cx) * (x0 - sphere.cx));
+        verticale2(x0, y0, y1); // Trace une ligne verticale
+        x0++;
+        x--;
+    }
+}
+void point(struct Cercle sphere){
+    int x0 = sphere.cx - sphere.r;
+    int x1 = sphere.cx + sphere.r;
+    double y0, y1;
+
+    while(x0 <= x1){
+        y0 = sphere.cy + sqrt((sphere.r * sphere.r) - (x0 - sphere.cx) * (x0 - sphere.cx));
+        y1 = sphere.cy - sqrt((sphere.r * sphere.r) - (x0 - sphere.cx) * (x0 - sphere.cx));
+        ombre(x0, y0, y1, boule.cz); // Prend les 2 extrémités (hautes et basses) de chaque point x du cercle, et calcul l'ombre de tous les points entre y0 et y1
+        x0++;
     }
 }
 
@@ -421,15 +546,10 @@ int main(int argc, char *argv[])
     struct Oeil o = {50,250,-1000};
     struct Lumiere l = {20,50,100};
 
-    polygones(p1); // Initialiser chaque face avant projection
+    polygones(); // Initialiser chaque face avant projection
     vNormal();
     centre(); // calcule du centre de chaque face
     lumiere(l); // calcule du centre de chaque face
-
-    projection(o); // Projection des faces du polygone
-    polygones(q); // Attribution des nouvelles coordonnées projetées au polygone
-
-/*Si on fait */
 
     /*Polygones parallelepipede*/
     for (int i = 0; i < POL; i++)
@@ -474,6 +594,13 @@ int main(int argc, char *argv[])
         remplirPolygone(xmin, xmax, i);
         SDL_RenderPresent(renderer);
     }
+
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); 
+    projet(); // Projection du centre de la sphere
+    rayon(); // Calcul du rayon du cercle
+    disque(cercle); // Dessin de disque noire (avant raytracing)
+    point(cercle); // Calcul la luminausité de chaque point du cercle de centre C', rayon R'
+    SDL_RenderPresent(renderer);
 
     SDL_Event event;
     SDL_bool quitter = SDL_FALSE;
