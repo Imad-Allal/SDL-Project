@@ -22,7 +22,7 @@ struct Point
 
 struct PntAdv
 {
-    double x,y,z,n,a;
+    double x,y,z,n,a,b;
 };
 
 struct Equation{
@@ -31,7 +31,7 @@ struct Equation{
 };
 
 struct Cercle boule = {300,1000,400,200};
-struct Point l = {1000,100,-300};
+struct Point l = {100,800,100};
 struct Point o = {250,250,-500};
 struct Equation eq[N];
 struct Cercle cercle;
@@ -66,10 +66,14 @@ void projet(){ // Porjette la sphere 3D en un disque 2D noire
     }
 }
 int intersection(double px, double py, double pz){ //L'intersection de OP avec la boule
+    
     double a, b, c, rac, t0, t1;
     struct PntAdv cp[2];
     struct PntAdv p[2];
-    struct PntAdv pl;
+    struct PntAdv po[2];
+    struct PntAdv q;
+    struct PntAdv ql;
+    struct PntAdv cq;
     struct Point e;
     
     //Calcul de vecteur OP
@@ -82,13 +86,14 @@ int intersection(double px, double py, double pz){ //L'intersection de OP avec l
     //Calcul des valeurs de a, b ,c
     a = e.x*e.x + e.y*e.y + e.z*e.z;
     b = 2 * e.x * (o.x - boule.cx) + 2 * e.y * (o.y - boule.cy) + 2 * e.z * (o.z - boule.cz);
-    c = (o.x - boule.cx) * (o.x - boule.cx) + (o.y - boule.cy) * (o.y - boule.cy) + (o.z - boule.cz) * (o.z - boule.cz) - (boule.r * boule.r);
-    //printf("a : %f, b : %f, c : %f\n", a, b, c);
+    c = (o.x - boule.cx) * (o.x - boule.cx) + (o.y - boule.cy) * (o.y - boule.cy) + (o.z - boule.cz) * (o.z - boule.cz) - ((boule.r * boule.r));
+    printf("a : %f, b : %f, c : %f\n", a, b, c);
+    printf("b*b : %f, 4*a*c : %f\n", b*b, 4*a*c);
 
-    rac = sqrt(b * b - 4 * a * c);
-    printf("rac : %lf,%g\n", rac,b*b -4*a*c);
+    rac = sqrt((b * b) - (4 * a * c));
+    //printf("rac : %lf,%lf\n", rac, b * b - 4 * a * c);
     t0 = (-b + rac) / (2 * a);
-    t1 = (-b-rac)/(2 * a);
+    t1 = (-b - rac) / (2 * a);
     //printf("t0 = %f, t1 = %f\n", t0, t1);
 
     p[0].x = t0 * e.x + o.x;
@@ -99,13 +104,13 @@ int intersection(double px, double py, double pz){ //L'intersection de OP avec l
     p[1].y = t1 * e.y + o.y;
     p[1].z = t1 * e.z + o.z;
 
-    pl.x = l.x - px;
-    pl.y = l.y - py;
-    pl.z = l.z - pz;
+    po[0].x = o.x - p[0].x;
+    po[0].y = o.y - p[0].y;
+    po[0].z = o.z - p[0].z;
 
-    pl.n = sqrt((pl.x * pl.x) + (pl.y * pl.y) + (pl.z * pl.z));
-
-    //printf("p.x = %f, p.y = %f, p.z = %f, p.n = %f\n", p[0].x, p[0].y, p[0].z);
+    po[1].x = o.x - p[1].x;
+    po[1].y = o.y - p[1].y;
+    po[1].z = o.z - p[1].z;
 
     cp[0].x = p[0].x - boule.cx;
     cp[0].y = p[0].y - boule.cy;
@@ -115,29 +120,33 @@ int intersection(double px, double py, double pz){ //L'intersection de OP avec l
     cp[1].y = p[1].y - boule.cy;
     cp[1].z = p[1].z - boule.cz;
 
-    cp[0].n = sqrt((cp[0].x * cp[0].x) + (cp[0].y * cp[0].y) + (cp[0].z * cp[0].z));
-    cp[1].n = sqrt((cp[1].x * cp[1].x) + (cp[1].y * cp[1].y) + (cp[1].z * cp[1].z));
+    p[0].b = (po[0].x * cp[0].x) + (po[0].y * cp[0].y) + (po[0].z * cp[0].z);
+    p[1].b = (po[1].x * cp[1].x) + (po[1].y * cp[1].y) + (po[1].z * cp[1].z);
 
-    p[0].a = ((pl.x * cp[0].x) + (pl.y * cp[0].y) + (pl.z * cp[0].z)) / (pl.n * cp[0].n);
-    p[1].a = ((pl.x * cp[1].x) + (pl.y * cp[1].y) + (pl.z * cp[1].z)) / (pl.n * cp[1].n);
+    if (p[0].b>0)
+        q = p[0];
+    else
+        q = p[1];
+
+    ql.x = l.x - q.x;
+    ql.y = l.y - q.y;
+    ql.z = l.z - q.z;
+
+    cq.x = q.x - boule.cx;
+    cq.y = q.y - boule.cy;
+    cq.z = q.y - boule.cz;
+
+    ql.n = sqrt((ql.x * ql.x) + (ql.y * ql.y) + (ql.z * ql.z)); // La norme du vecteur QL
+    cq.n = sqrt((cq.x * cq.x) + (cq.y * cq.y) + (cq.z * cq.z));
+
+    //printf("p.x = %f, p.y = %f, p.z = %f, p.n = %f\n", p[0].x, p[0].y, p[0].z);
+
+    q.a = (ql.x * cq.x + ql.y * cq.y + ql.z * cq.z) / (ql.n * cq.n);
+
     //printf("cp.x = %f, cp.y = %f, cp.z = %f, cp.n = %f\n", cp[0].x, cp[0].y, cp[0].z, cp[0].n);
 
-    if (p[0].a > 0){
-        SDL_SetRenderDrawColor(renderer, p[0].a*255, p[0].a*255, p[0].a*255, 255);
-        SDL_RenderDrawPoint(renderer, px, py);
-    }
-    else{
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-        SDL_RenderDrawPoint(renderer, px, py);
-    }
-    if (p[1].a > 0){
-        SDL_SetRenderDrawColor(renderer, p[1].a*255, p[1].a*255, p[1].a*255, 255);
-        SDL_RenderDrawPoint(renderer, px, py);
-    }
-    else{
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-        SDL_RenderDrawPoint(renderer, px, py);
-    }
+    SDL_SetRenderDrawColor(renderer, q.a*255, q.a*255, q.a*255, 255);
+    SDL_RenderDrawPoint(renderer, px, py);
     //printf("a1 = %lf, a2 = %lf\n", p[0].a, p[1].a);
 }
 
