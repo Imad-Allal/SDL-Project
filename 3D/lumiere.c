@@ -13,7 +13,7 @@ SDL_Window *window;
 SDL_Renderer *renderer;
 
 struct Face {
-    int x, y, z, cx, cy, cz, nx, ny, nz;
+    float x, y, z, cx, cy, cz, nx, ny, nz, vx, vy, vz;
 };
 
 struct Oeil
@@ -34,6 +34,12 @@ struct Equation{
     int x, y, z, e;
     float tq;
 };
+struct Vecteur{
+    float x, y, z;
+};
+struct Scalaire{
+    float x, y, z;
+};
 
 struct Face face[6][4];
 
@@ -51,7 +57,12 @@ struct Prl p1[N] = {
 
 struct Equation eq[N];
 struct Prl q[N];
-struct Lumiere cl[N];
+struct Lumiere cl[POL];
+struct Vecteur co[POL];
+struct Scalaire b[POL];
+
+struct Oeil o = {100,250,-500};
+struct Lumiere l = {200,90,-100};
 
 void quit(){
     if (renderer != NULL)
@@ -273,31 +284,31 @@ void polygones(struct Prl p[8]){
     face[2][3].y = p[2].py;
     face[2][3].z = p[2].pz;
     
-    face[3][0].x = p[4].px;
-    face[3][0].y = p[4].py;
-    face[3][0].z = p[4].pz;
-    face[3][1].x = p[5].px;
-    face[3][1].y = p[5].py;
-    face[3][1].z = p[5].pz;
-    face[3][2].x = p[1].px;
-    face[3][2].y = p[1].py;
-    face[3][2].z = p[1].pz;
-    face[3][3].x = p[0].px;
-    face[3][3].y = p[0].py;
-    face[3][3].z = p[0].pz;
+    face[4][0].x = p[4].px;
+    face[4][0].y = p[4].py;
+    face[4][0].z = p[4].pz;
+    face[4][1].x = p[5].px;
+    face[4][1].y = p[5].py;
+    face[4][1].z = p[5].pz;
+    face[4][2].x = p[1].px;
+    face[4][2].y = p[1].py;
+    face[4][2].z = p[1].pz;
+    face[4][3].x = p[0].px;
+    face[4][3].y = p[0].py;
+    face[4][3].z = p[0].pz;
 
-    face[4][0].x = p[0].px;
-    face[4][0].y = p[0].py;
-    face[4][0].z = p[0].pz;
-    face[4][1].x = p[4].px;
-    face[4][1].y = p[4].py;
-    face[4][1].z = p[4].pz;
-    face[4][2].x = p[7].px;
-    face[4][2].y = p[7].py;
-    face[4][2].z = p[7].pz;
-    face[4][3].x = p[3].px;
-    face[4][3].y = p[3].py;
-    face[4][3].z = p[3].pz;
+    face[3][0].x = p[0].px;
+    face[3][0].y = p[0].py;
+    face[3][0].z = p[0].pz;
+    face[3][1].x = p[4].px;
+    face[3][1].y = p[4].py;
+    face[3][1].z = p[4].pz;
+    face[3][2].x = p[7].px;
+    face[3][2].y = p[7].py;
+    face[3][2].z = p[7].pz;
+    face[3][3].x = p[3].px;
+    face[3][3].y = p[3].py;
+    face[3][3].z = p[3].pz;
     
 
     j = 0;
@@ -313,59 +324,68 @@ void polygones(struct Prl p[8]){
 void vNormal(){
     struct Face u;
     struct Face v;
-    for (int i = 0; i < POL; i++){
-        u.x = face[i][0].x - face[i][3].x;
-        u.y = face[i][0].y - face[i][3].y;
-        u.z = face[i][0].z - face[i][3].z;
+    double norme = 0;
+    for (int i = 0; i < POL; i++)
+    {
+        u.x = face[i][0].x - face[i][1].x;
+        u.y = face[i][0].y - face[i][1].y;
+        u.z = face[i][0].z - face[i][1].z;
 
-        v.x = face[i][2].x - face[i][3].x;
-        v.y = face[i][2].y - face[i][3].y;
-        v.z = face[i][2].z - face[i][3].z;
+        v.x = face[i][1].x - face[i][2].x;
+        v.y = face[i][1].y - face[i][2].y;
+        v.z = face[i][1].z - face[i][2].z;
 
+        //Produit scalaire U V
         face[i][0].nx = (u.y * v.z) - (u.z * v.y);
         face[i][0].ny = (u.z * v.x) - (u.x * v.z);
         face[i][0].nz = (u.x * v.y) - (u.y * v.x);
-        if (face[i][0].nx > 0)
-            face[i][0].nx = 1;
-        else if (face[i][0].nx < 0)
-            face[i][0].nx = -1;
+        //Produit scalaire
 
-        if (face[i][0].ny > 0)
-            face[i][0].ny = 1;
-        else if (face[i][0].ny < 0)
-            face[i][0].ny = -1;
+        //Norme du produit vectoriel
+        norme = sqrt(face[i][0].nx * face[i][0].nx + face[i][0].ny * face[i][0].ny + face[i][0].nz * face[i][0].nz);
 
-        if (face[i][0].nz > 0)
-            face[i][0].nz = 1;
-        else if (face[i][0].nz < 0)
-            face[i][0].nz -1;
-
+        face[i][0].vx = (face[i][0].nx) / norme;
+        face[i][0].vy = (face[i][0].ny) / norme;
+        face[i][0].vz = (face[i][0].nz) / norme;
+        printf("Face = %d, n'x = %lf, n'y = %lf, n'z = %lf\n", i, face[i][0].vx, face[i][0].vy, face[i][0].vz);
     }
 }
 
 void centre(){
     for (int i = 0; i < POL; i++)
     {
-            face[i][0].cx = (face[i][0].x + face[i][2].x) / 2; 
-            face[i][0].cy = (face[i][0].y + face[i][2].y) / 2;
+        face[i][0].cx = (face[i][0].x + face[i][2].x) / 2; 
+        face[i][0].cy = (face[i][0].y + face[i][2].y) / 2;
     }
 }
 
 void lumiere(struct Lumiere l){
-
     for (int i = 0; i < POL; i++)
+    {
+        co[i].x = o.ox - face[i][0].cx;
+        co[i].y = o.oy - face[i][0].cy;
+        co[i].z = o.oz - face[i][0].cz;
+
+        b[i].x = face[i][0].vx * co[i].x + face[i][0].vy * co[i].y + face[i][0].vz * co[i].z;
+        printf("β = %lf\n", b[i].x);
+    }
+    b[2].x = -b[2].x;
+    b[4].x = -b[4].x;
+    b[5].x = -b[5].x;
+
+    for (int i = 0; i < POL; i++) // Intensité lumineuse
     {
         cl[i].lx = l.lx - face[i][0].cx; // CL.x
         cl[i].ly = l.ly - face[i][0].cy; // CL.y
         cl[i].lz = l.lz - face[i][0].cz; // CL.z
 
-        cl[i].ne = sqrt((cl[i].lx*cl[i].lx) + (cl[i].ly*cl[i].ly) + (cl[i].lz*cl[i].lz)); // Norme de CL 
+        cl[i].ne = sqrt((cl[i].lx * cl[i].lx) + (cl[i].ly * cl[i].ly) + (cl[i].lz * cl[i].lz)); // Norme de CL
 
         cl[i].vx = cl[i].lx / cl[i].ne; // Le rayon lumineux au point x
         cl[i].vy = cl[i].ly / cl[i].ne; // Le rayon lumineux au point y
         cl[i].vz = cl[i].lz / cl[i].ne; // Le rayon lumineux au point z
 
-        cl[i].a = (cl[i].vx * face[i][0].nx) + (cl[i].vy * face[i][0].ny) + (cl[i].vz * face[i][0].nz); // l'intensité lumineuse α
+        cl[i].a = (cl[i].vx * face[i][0].vx) + (cl[i].vy * face[i][0].vy) + (cl[i].vz * face[i][0].vz); // l'intensité lumineuse α
         printf("α = %lf\n", cl[i].a);
     }
 }
@@ -417,13 +437,10 @@ int main(int argc, char *argv[])
         quit();
         return EXIT_FAILURE;
     }
-
-    struct Oeil o = {50,250,-1000};
-    struct Lumiere l = {20,50,100};
-
     polygones(p1); // Initialiser chaque face avant projection
     vNormal();
     centre(); // calcule du centre de chaque face
+
     lumiere(l); // calcule du centre de chaque face
 
     projection(o); // Projection des faces du polygone
@@ -446,7 +463,7 @@ int main(int argc, char *argv[])
         }
     }
     /*Polygones parallelepipede*/
-    for (int i = 0; i <POL; i++)
+    for (int i = 0; i < POL; i++)
     {
         xmin = WIDTH;
         xmax = 0;
@@ -467,11 +484,12 @@ int main(int argc, char *argv[])
                     ymin = face[i][j].y;
                 }
         }
-        if (cl[i].a > 0)
-            SDL_SetRenderDrawColor(renderer, cl[i].a*255, cl[i].a*255, cl[i].a*255, 255);
+        if (b[i].x > 0)
+            SDL_SetRenderDrawColor(renderer, cl[i].a*255, cl[i].a*255, cl[i].a*255, 5);
         else
-            SDL_SetRenderDrawColor(renderer, cl[i].a*255, cl[i].a*255, cl[i].a*255, 255);
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 5);
         remplirPolygone(xmin, xmax, i);
+        SDL_Delay(100);
         SDL_RenderPresent(renderer);
     }
 

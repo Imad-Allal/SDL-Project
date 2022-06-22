@@ -31,7 +31,7 @@ struct Equation{
 };
 
 struct Cercle boule = {300,1000,400,200};
-struct Point l = {100,100,300};
+struct Point l = {1000,100,-300};
 struct Point o = {250,250,-500};
 struct Equation eq[N];
 struct Cercle cercle;
@@ -86,7 +86,7 @@ int intersection(double px, double py, double pz){ //L'intersection de OP avec l
     //printf("a : %f, b : %f, c : %f\n", a, b, c);
 
     rac = sqrt(b * b - 4 * a * c);
-    //printf("rac : %f\n", rac);
+    printf("rac : %lf,%g\n", rac,b*b -4*a*c);
     t0 = (-b + rac) / (2 * a);
     t1 = (-b-rac)/(2 * a);
     //printf("t0 = %f, t1 = %f\n", t0, t1);
@@ -126,11 +126,18 @@ int intersection(double px, double py, double pz){ //L'intersection de OP avec l
         SDL_SetRenderDrawColor(renderer, p[0].a*255, p[0].a*255, p[0].a*255, 255);
         SDL_RenderDrawPoint(renderer, px, py);
     }
+    else{
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderDrawPoint(renderer, px, py);
+    }
     if (p[1].a > 0){
         SDL_SetRenderDrawColor(renderer, p[1].a*255, p[1].a*255, p[1].a*255, 255);
         SDL_RenderDrawPoint(renderer, px, py);
     }
-
+    else{
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderDrawPoint(renderer, px, py);
+    }
     //printf("a1 = %lf, a2 = %lf\n", p[0].a, p[1].a);
 }
 
@@ -243,7 +250,7 @@ int main(int argc, char *argv[])
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); 
     projet(); // Projection du centre de la sphere
     rayon(); // Calcul du rayon du cercle
-    disque(cercle); // Dessin de disque noire (avant raytracing)
+    //disque(cercle); // Dessin de disque noire (avant raytracing)
     point(cercle); // Calcul la luminausité de chaque point du cercle de centre C', rayon R'
     SDL_RenderPresent(renderer);
     SDL_Event event;
