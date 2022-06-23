@@ -31,8 +31,8 @@ struct Equation{
 };
 
 struct Cercle boule = {300,1000,400,300};
-struct Point l = {250,900,1000};
-struct Point o = {250,250,-500};
+struct Point l = {50,90,1500};
+struct Point o = {250,250, -500};
 struct Equation eq[N];
 struct Cercle cercle;
 
