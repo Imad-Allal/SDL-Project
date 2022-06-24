@@ -16,22 +16,22 @@ struct Vecteur{
     int x,y, norme;
 };
 
-SDL_Point ball = {300, 1100};
+SDL_Point ball = {500, 1100};
 SDL_Point p_droite;
 SDL_Point tr[2][3] = {
     {{0, 0},
      {750, 0},
-     {0, 500}},
+     {0, 450}},
     {{1500, 0},
      {750, 0},
-     {1500, 500}},
+     {1500, 450}},
 };
 
 struct Vecteur u[2];
 
 int xmin, xmax, ymin, ymax;
 int x, y;
-int ux = 1, uy = 1; //A modifier: ux = 1
+int ux = 3, uy = 2; //A modifier: ux = 1
 int r = 27;
 
 void quit(){
@@ -189,12 +189,12 @@ void all(){
         }
     }
     */
-    algoNaif(0, 500, 750, 0);
-    algoNaif(1500, 500, 750, 0);
+    algoNaif(0, 400, 750, 0);
+    algoNaif(1500, 400, 750, 0);
     disque(x, y);
 }
 
-int toit(int xc, int yc){
+int toitG(int xc, int yc){
     SDL_Point t;
     SDL_Point g;
     SDL_Point d;
@@ -211,14 +211,14 @@ int toit(int xc, int yc){
         t.y = yc;
         for (int i = 0; i < 750; i++)
         {
-            droiteG(0,500,750,0,i);
+            droiteG(0, 400, 750, 0,i);
             if (t.x == p_droite.x && t.y == p_droite.y)
             {
                 return 1;
             }
         }
         for (int j = 0; j > -750; j--){
-            droiteD(1500,500,750,0,j);
+            droiteD(1500, 400, 750, 0, j);
             if (t.x == p_droite.x && t.y == p_droite.y){
                 return 2;
             }
@@ -228,7 +228,7 @@ int toit(int xc, int yc){
     }
 }
 
-void mouvement(){
+int mouvement(){
     int stop = 0;
     int x_precedent, y_precedent;
     x_precedent = x;
@@ -247,86 +247,65 @@ void mouvement(){
         xmax = x + r;
         ymax = y + r;
 
-        if (ymax == HEIGHT+r*2)
+        if (ymax >= HEIGHT+r*2){
             quit();
+            return EXIT_SUCCESS;
+        }
+            if (ymin <= 1)
+                uy = -uy;
 
-        if(y <= 500){
-            if(toit(x,y) == 1){ // Droite Gauche
-                // Calcule des vecteurs u et v;
-                u[0].x = x - x_precedent;
-                u[0].y = y - y_precedent;
-                u[1].x = 0;
-                u[1].y = y - y_precedent;
-
-                u[0].norme = sqrt(u[0].x * u[0].x + u[0].y * u[0].y); // Calcule de la norme de u
-                u[1].norme = sqrt(u[1].x * u[1].x + u[1].y * u[1].y); // Calcule de la norme de v
-
-                a = u[0].x * u[1].x + u[0].y * u[1].y;
-                b = u[0].norme * u[1].norme;
-                printf("a = %d, b = %d\n", a, b);
-
-                alpha = (float)a / (float)b;
-                printf("alpha = %f\n", alpha);
-                if (alpha <=1){
-                    if (ux == 0)
+            if (y <= 400)
+            {
+                if (toit(x, y) == 1)
+                { // Droite Gauche
+                    if (uy != 0)
                     {
-                        ux = ux-1;
+                        if (x_precedent > x)
+                        {
+                            ux = -2;
+                        }
+                        else if (x_precedent < x)
+                        {
+                            ux = -4;
+                        }
+                        else{
+                        ux = -2;
                         uy = 0;
                     }
-                    else if(uy == 0)
-                    {
-                        ux = 0;
-                        uy = uy-1;
-                    }
-                    else{
-                        ux = +1;
-                        uy -= alpha;
-                    }
-                }
-                        }
-            if(toit(x,y) == 2){ // Droite Droite
-                // Calcule des vecteurs u et v;
-                u[0].x = x - x_precedent;
-                u[0].y = y - y_precedent;
-                u[1].x = 0;
-                u[1].y = y - y_precedent;
-
-
-                u[0].norme = sqrt(u[0].x * u[0].x + u[0].y * u[0].y); // Calcule de la norme de u
-                u[1].norme = sqrt(u[1].x * u[1].x + u[1].y * u[1].y); // Calcule de la norme de v
-
-                a = u[0].x * u[1].x + u[0].y * u[1].y;
-                b = u[0].norme * u[1].norme;
-
-                printf("a = %d, b = %d\n", a, b);
-                alpha = (float)a / (float)b;
-                printf("alpha = %f\n", alpha);
-                if (alpha <=1){
-                if (ux == 0)
-                {
-                    ux = ux+1;
-                    uy = 0;
-                }
-                else if(uy == 0)
-                {
-                    ux = 0;
-                    uy = uy-1;
                 }
                 else{
-                    ux += alpha;
-                    uy -= alpha;
+                    uy = -2;
+                    ux = 0;
                 }
             }
+            if(toit(x,y) == 2){ // Droite Droite
+                if(uy != 0){
+                    if (x_precedent > x){
+                        ux = -ux;
+                        uy = 2;
+                    }
+                    else if (x_precedent < x){
+                        ux = 4;
+                    }
+                    else{
+                        ux = 2;
+                        uy = 0;
+                    }
+                }
+                else{
+                    uy = -2;
+                    ux = 0;
+                }
             }
         }
-        if (xmax == WIDTH){
+        if (xmax >= WIDTH){
             ux = -ux;
             x_precedent = x;
             y_precedent = y;
             stop++;
         }  
 
-        if (xmin == 0)
+        if (xmin <= 0)
         {
             ux = -ux;
             x_precedent = x;
@@ -337,6 +316,8 @@ void mouvement(){
         y = y - uy;
 
         all();
+        if (ux == -4)
+            SDL_Delay(2);
         SDL_RenderPresent(renderer);
     }
 }
@@ -396,7 +377,8 @@ int main(int argc, char *argv[])
                         quit();
                         break;
                     case SDLK_c:
-                        mouvement();
+                        if(!mouvement())
+                            quitter = SDL_TRUE;
                         break;
                     default:
                         printf("Vous avez appuyé sur la touche : %c\n", event.key.keysym.sym);
