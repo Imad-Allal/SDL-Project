@@ -280,7 +280,7 @@ void mouvement(){
                     }
                     else{
                         ux = +1;
-                        uy - 1;
+                        uy -= alpha;
                     }
                 }
                         }
@@ -302,15 +302,19 @@ void mouvement(){
                 alpha = (float)a / (float)b;
                 printf("alpha = %f\n", alpha);
                 if (alpha <=1){
-                if (alpha <= 1 && ux == 0)
+                if (ux == 0)
                 {
                     ux = ux+1;
                     uy = 0;
                 }
-                else if(alpha <= 1 && uy == 0)
+                else if(uy == 0)
                 {
                     ux = 0;
                     uy = uy-1;
+                }
+                else{
+                    ux += alpha;
+                    uy -= alpha;
                 }
             }
             }
