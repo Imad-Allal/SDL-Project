@@ -16,7 +16,7 @@ struct Vecteur{
     int x,y, norme;
 };
 
-SDL_Point ball = {500, 1100};
+SDL_Point ball = {900, 900};
 SDL_Point p_droite;
 SDL_Point tr[2][3] = {
     {{0, 0},
@@ -28,11 +28,16 @@ SDL_Point tr[2][3] = {
 };
 
 struct Vecteur u[2];
+SDL_Point palette[4] = {{600,1370},
+                        {900, 1370},
+                        {900,1400}, 
+                        {600,1400}
+                        };
 
 int xmin, xmax, ymin, ymax;
 int x, y;
-int ux = 3, uy = 2; //A modifier: ux = 1
-int r = 27;
+int ux =10, uy = 7; //A modifier: ux = 1
+int r = 22;
 
 void quit(){
     if (renderer != NULL)
@@ -113,6 +118,29 @@ void algoNaif(int x0, int y0, int x1, int y1){
     }
 }
 
+void rectangle(){
+    int xmin = WIDTH, xmax = 0, ymin = HEIGHT, ymax = 0;
+    for (int i = 0; i < 4; i++)
+    {
+        if (palette[i].x >= xmax){
+            xmax = palette[i].x;
+        }
+        if (palette[i].x <= xmin){
+            xmin = palette[i].x;
+        }
+        if (palette[i].y >= ymax){
+            ymax = palette[i].y;
+        }
+        if (palette[i].y <= ymin){
+            ymin = palette[i].y;
+        }
+
+    }
+    for (int i = ymin; i <= ymax; i++){
+        horizontale(xmin, i, xmax - xmin);
+    }
+}
+
 void triangle(int x0, int x1, int y0, int y1){
     float i, x, y, m;
     int dx = x1 - x0;
@@ -177,7 +205,7 @@ void disque(int cx, int cy){
 }
 
 void all(){
-    /*for (int i = 0; i < 2; i++){
+    for (int i = 0; i < 2; i++){
         for (int j = 0; j < 3; j++){
             if (j == 2)
             {
@@ -188,16 +216,15 @@ void all(){
             }
         }
     }
-    */
+    
     algoNaif(0, 400, 750, 0);
     algoNaif(1500, 400, 750, 0);
     disque(x, y);
+    rectangle();
 }
 
 int toitG(int xc, int yc){
     SDL_Point t;
-    SDL_Point g;
-    SDL_Point d;
     int x0 = xc - r;
     int x1 = xc + r;
     int x = x1;
@@ -209,34 +236,73 @@ int toitG(int xc, int yc){
         y0 = ball.y + sqrt((r * r) - (x0 - ball.x) * (x0 - ball.x));
         t.x = x0;
         t.y = yc;
-        for (int i = 0; i < 750; i++)
+        for (int i = 0; i < 760; i++)
         {
-            droiteG(0, 400, 750, 0,i);
+            droiteG(0, 430, 750, 30,i);
             if (t.x == p_droite.x && t.y == p_droite.y)
             {
                 return 1;
             }
         }
+        x0++;
+        x--;
+    }
+    return 0;
+}
+
+int toitD(int xc, int yc){
+    SDL_Point t;
+    int x0 = xc - r;
+    int x1 = xc + r;
+    int x = x1;
+    float y0;
+    int dx;
+
+    while(x0 <= x1){
+        dx = x - x0;
+        y0 = ball.y + sqrt((r * r) - (x0 - ball.x) * (x0 - ball.x));
+        t.x = x0;
+        t.y = yc;
         for (int j = 0; j > -750; j--){
-            droiteD(1500, 400, 750, 0, j);
+            droiteD(1500, 430, 750, 30, j);
             if (t.x == p_droite.x && t.y == p_droite.y){
-                return 2;
+                return 1;
             }
         }
         x0++;
         x--;
     }
+    return 0;
 }
 
 int mouvement(){
+
     int stop = 0;
     int x_precedent, y_precedent;
     x_precedent = x;
     y_precedent = y;
     int a, b;
     float alpha;
+/*    
+    SDL_Event event;
+    SDL_bool quitter = SDL_FALSE;
 
-    while (stop < 5)
+    while(!quitter){
+        while (SDL_WaitEvent(&event)){
+            switch(event.type){
+                case SDL_KEYDOWN:
+                switch (event.key.keysym.sym) {
+                    case SDLK_a:
+                        printf("Vous avez demandé à quitter le programme\n");
+                        quitter = SDL_TRUE;
+                        quit();
+                        break;
+                    case SDLK_c:
+                        if(!mouvement())
+                            quitter = SDL_TRUE;
+                        break;
+*/                        
+    while (stop < 3)
     {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
@@ -247,56 +313,85 @@ int mouvement(){
         xmax = x + r;
         ymax = y + r;
 
-        if (ymax >= HEIGHT+r*2){
+        /*if (ymax >= HEIGHT+r*2){
             quit();
             return EXIT_SUCCESS;
+        }*/
+        if (ymax >= HEIGHT){
+            uy = -uy;
+            stop++;
         }
-            if (ymin <= 1)
+            if (ymin <= 10)
                 uy = -uy;
 
             if (y <= 400)
             {
-                if (toit(x, y) == 1)
-                { // Droite Gauche
-                    if (uy != 0)
-                    {
-                        if (x_precedent > x)
+                if(x<=750){
+                    if (toitG(x, y))
+                    { // Droite Gauche
+                        if (ux != 0)
                         {
-                            ux = -2;
-                        }
-                        else if (x_precedent < x)
-                        {
-                            ux = -4;
+                            if (y_precedent > y && uy != 0)
+                            {
+                                if (x_precedent>x){
+                                    ux = -ux;
+                                    uy = -uy;
+                                }
+                                else if (x_precedent<x)
+                                    ux = -20;{
+                                }
+                            }
+                            else if (y_precedent < y && uy != 0)
+                            {
+                                ux = 4;
+                            }
+                            else if (y_precedent == y && uy != 0){
+                                uy = -3;
+                                ux = 0;
+                            }
+                            else if (uy == 0) {
+                                uy = -3;
+                                ux = 0;
+                            }
                         }
                         else{
-                        ux = -2;
-                        uy = 0;
+                            ux = -3;
+                            uy = 0;
+                        }
                     }
                 }
-                else{
-                    uy = -2;
-                    ux = 0;
-                }
-            }
-            if(toit(x,y) == 2){ // Droite Droite
-                if(uy != 0){
-                    if (x_precedent > x){
-                        ux = -ux;
-                        uy = 2;
+                else if(x>=750){
+                    if(toitD(x,y))
+                    { // Droite Droite
+                        if(ux != 0){
+                            if (y_precedent > y && uy !=0){
+                                if (x_precedent > x){
+                                    ux = 20;
+                                }
+                                else if (x_precedent < x){
+                                    ux = -ux;
+                                    uy = -uy;
+                                    printf("y_pre = %d,, y = %d\n",y_precedent, y);
+                                }
+                            }
+                            else if (y_precedent < y && uy !=0){
+                                ux = -1;
+                            }
+                            else if (y_precedent < y && uy != 0){
+                                uy = -3;
+                                ux = 0;
+                            }
+                            else if (uy == 0) {
+                                uy = -3;
+                                ux = 0;
+                            }
+                        }
+                        else{
+                            ux = 3;
+                            uy = 0;
+                        }
                     }
-                    else if (x_precedent < x){
-                        ux = 4;
-                    }
-                    else{
-                        ux = 2;
-                        uy = 0;
-                    }
                 }
-                else{
-                    uy = -2;
-                    ux = 0;
-                }
-            }
         }
         if (xmax >= WIDTH){
             ux = -ux;
@@ -316,8 +411,10 @@ int mouvement(){
         y = y - uy;
 
         all();
-        if (ux == -4)
+        if (ux == -4 || ux == 4)
             SDL_Delay(2);
+        if (ux == -8 || ux == 8)
+            SDL_Delay(6);
         SDL_RenderPresent(renderer);
     }
 }

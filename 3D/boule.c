@@ -87,8 +87,6 @@ int intersection(double px, double py, double pz){ //L'intersection de OP avec l
     a = e.x*e.x + e.y*e.y + e.z*e.z;
     b = 2 * e.x * (o.x - boule.cx) + 2 * e.y * (o.y - boule.cy) + 2 * e.z * (o.z - boule.cz);
     c = (o.x - boule.cx) * (o.x - boule.cx) + (o.y - boule.cy) * (o.y - boule.cy) + (o.z - boule.cz) * (o.z - boule.cz) - ((boule.r * boule.r));
-    printf("a : %f, b : %f, c : %f\n", a, b, c);
-    printf("b*b : %f, 4*a*c : %f\n", b*b, 4*a*c);
 
     rac = sqrt((b * b) - (4 * a * c));
     //printf("rac : %lf,%lf\n", rac, b * b - 4 * a * c);
@@ -191,7 +189,7 @@ void verticale (double x0, double y0, double y1){
 void rayon(){
     double oc1, oc2;
     oc1 = sqrt((boule.cx - o.x) * (boule.cx - o.x) + (boule.cy - o.y) * (boule.cy - o.y) + (boule.cz - o.z) * (boule.cz - o.z));
-    oc2 = sqrt((boule.cx - o.x) * (boule.cx - o.x) + (boule.cy - o.y) * (boule.cy - o.y));
+    oc2 = sqrt((cercle.cx - o.x) * (cercle.cx - o.x) + (cercle.cy - o.y) * (cercle.cy - o.y));
 
     cercle.r = boule.r * oc2 / oc1;
 }
