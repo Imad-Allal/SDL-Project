@@ -3,9 +3,7 @@
 #include <SDL2/SDL.h>
 #include <time.h>
 
-#define N 8
-#define POL 6
-#define PNT 4
+#define SIZE 30
 #define WIDTH 1500
 #define HEIGHT 1500
 
@@ -16,7 +14,7 @@ struct Rectangle{
     int xmin, xmax, ymin, ymax, cx, cy;
 };
 
-SDL_Point ball = {700, 900};
+SDL_Point ball = {700, 1305};
 SDL_Point p_droite;
 SDL_Point tr[2][3] = {
     {{0, 0},
@@ -26,7 +24,7 @@ SDL_Point tr[2][3] = {
      {750, 0},
      {1500, 450}},
 };
-struct Rectangle rec[30];
+struct Rectangle rec[SIZE];
 
 SDL_Point palette[4] = {{600,1370},
                         {900, 1370},
@@ -311,29 +309,13 @@ int toitD(int xc, int yc){
 
 int mouvement(){
 
+    int i = 0,j = 0;
     int stop = 0;
+    int taille;
     int x_precedent, y_precedent;
     x_precedent = x;
     y_precedent = y;
-/*    
-    SDL_Event event;
-    SDL_bool quitter = SDL_FALSE;
 
-    while(!quitter){
-        while (SDL_WaitEvent(&event)){
-            switch(event.type){
-                case SDL_KEYDOWN:
-                switch (event.key.keysym.sym) {
-                    case SDLK_a:
-                        printf("Vous avez demandé à quitter le programme\n");
-                        quitter = SDL_TRUE;
-                        quit();
-                        break;
-                    case SDLK_c:
-                        if(!mouvement())
-                            quitter = SDL_TRUE;
-                        break;
-*/                        
     while (stop < 3)
     {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -349,15 +331,20 @@ int mouvement(){
             quit();
             return EXIT_SUCCESS;
         }*/
-            for (int i = 0; i < 30; i++){
-                //if (toit(x,y,rec[i].xmin, rec[i].xmax, rec[i].ymin, rec[i].ymax)){
-                if (ymin == rec[i].ymax && x >=rec[i].xmin && x<=rec[i].xmax)
-                {
-                    uy = -uy;
-                    stop++;
-                    break;
-                }
+        for (i = 0; i < 30; i++)
+        {
+            printf("ymin = %d, ymax = %d, rec[%d].y = %d\n", ymin, ymax, i, rec[i].ymax);
+            if (ymin == rec[i].ymax && x >= rec[i].xmin && x <= rec[i].xmax)
+            {
+                uy = -uy;
+                stop++;
+                j++;
+                break;
             }
+        }
+            taille = SIZE - j;
+            struct Rectangle recNv[taille];
+            rectangle(recNv, taille, i, j);
             if (ymax >= HEIGHT)
             {
                 uy = -uy;
@@ -448,8 +435,8 @@ int mouvement(){
             y_precedent = y;
             stop++;
         }        
-        x = x - ux;
-        y = y - uy;
+        x = x - ux ;
+        y = y - uy ;
         all();
         if (ux == -4 || ux == 4)
             SDL_Delay(2);
