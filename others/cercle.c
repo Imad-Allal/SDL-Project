@@ -48,20 +48,16 @@ void cercle(int cx, int cy , int r){
     int x0 = cx - r;
     int x1 = cx + r;
     float y0, y1;
-    float y00 = cy, y11 = cy; //y00, y11 nous serviront à lier chaque point d cercle à celui qui le suit
-    while (x0 <= x1)
-    {
+    float y00 = cy, y11 = cy; 
+    while (x0 <= x1){
         y0 = cy + sqrt((r * r) - (x0 - cx) * (x0 - cx));
-        //SDL_RenderDrawPoint(renderer, x0, Round(y0));
         verticale(x0, Round(y0), Round(y00));
         y00 = y0;
 
         y1 = cy - sqrt((r * r) - (x0 - cx) * (x0 - cx));
-        //SDL_RenderDrawPoint(renderer, x0, Round(y1));
         verticale(x0, Round(y1), Round(y11));
         y11 = y1;
 
-        SDL_RenderPresent(renderer);
         x0++;
     }
 }
@@ -72,14 +68,12 @@ void disque(int cx, int cy , int r){
     int x = x1;
     float y0, y1;
     int dx;
-
     while(x0 <= x1){
         dx = x - x0;
         y0 = cy + sqrt((r * r) - (x0 - cx) * (x0 - cx));
         y1 = cy - sqrt((r * r) - (x0 - cx)  *(x0 - cx));
 
         verticale(x0, y0, y1);
-        SDL_RenderPresent(renderer);
 
         x0++;
         x--;

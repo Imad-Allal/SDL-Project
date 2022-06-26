@@ -190,16 +190,15 @@ void remplirPolygone(int xmin, int xmax){
     int y0, y1;
     int x = xmin;
     int i = 0, j = 0;
-    int cpt1 = 0, cpt2 = 0;
-    int min = bordGauche(xmin), max = bordDroit(xmax);
-    int taille1 = tailleP1(min, max), taille2 = tailleP2(min, max);
+    int cpt1 = 0, cpt2 = 0; // compteurs qui nous indiquent aux la fonction segSup, segInf, dans quel point du segement on se trouve
+    int min = bordGauche(xmin), max = bordDroit(xmax); // Renvoient l'index du bord le plus à gauche et de l'autre le plus à droite
+    int taille1 = tailleP1(min, max), taille2 = tailleP2(min, max); // Pour initialiser p1 et p2
     SDL_Point p1[taille1], p2[taille2];
-    listeP1(min, max, p1, taille1);
-    listeP2(min, max, p2, taille2);
-
+    listeP1(min, max, p1, taille1); // Stock dans p1 tous les segements hauts du polygones
+    listeP2(min, max, p2, taille2); // Stock dans p2 tous les segements bas du polygones
 
     while (x < xmax){
-        if(x == p1[i+1].x){
+        if(x == p1[i+1].x){ // x == debut du segement p1[i+1] ==> Réinitialiser le compteur cpt1
             i++;
             cpt1 = 0;
         }

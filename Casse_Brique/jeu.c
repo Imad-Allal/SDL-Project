@@ -12,11 +12,11 @@
 SDL_Window *window;
 SDL_Renderer *renderer;
 
-struct Vecteur{
-    int x,y, norme;
+struct Rectangle{
+    int xmin, xmax, ymin, ymax, cx, cy;
 };
 
-SDL_Point ball = {900, 900};
+SDL_Point ball = {700, 900};
 SDL_Point p_droite;
 SDL_Point tr[2][3] = {
     {{0, 0},
@@ -26,8 +26,8 @@ SDL_Point tr[2][3] = {
      {750, 0},
      {1500, 450}},
 };
+struct Rectangle rec[30];
 
-struct Vecteur u[2];
 SDL_Point palette[4] = {{600,1370},
                         {900, 1370},
                         {900,1400}, 
@@ -36,8 +36,8 @@ SDL_Point palette[4] = {{600,1370},
 
 int xmin, xmax, ymin, ymax;
 int x, y;
-int ux =10, uy = 7; //A modifier: ux = 1
-int r = 22;
+int ux =15, uy = 15; //A modifier: ux = 1
+int r = 25;
 
 void quit(){
     if (renderer != NULL)
@@ -104,7 +104,6 @@ void algoNaif(int x0, int y0, int x1, int y1){
             for (i = 0; i < dx; i++){
                 x = x0 + i;
                 y = Round(y0 + m * i);
-                SDL_RenderDrawPoint(renderer, x, y);
             }
         }
         else{
@@ -112,13 +111,12 @@ void algoNaif(int x0, int y0, int x1, int y1){
             for (i = 0; i > dx; i--){
                 x = x0 + i;
                 y = Round(y0 + m * i);
-                SDL_RenderDrawPoint(renderer, x, y);
             }
         }
     }
 }
 
-void rectangle(){
+void pal(){
     int xmin = WIDTH, xmax = 0, ymin = HEIGHT, ymax = 0;
     for (int i = 0; i < 4; i++)
     {
@@ -204,7 +202,40 @@ void disque(int cx, int cy){
     }
 }
 
+void remplirRec(int x0, int x1, int y0, int y1){
+    int y = y0;
+    int dx = x1 - x0;
+    while (y < y1)
+    {
+        horizontale(x0, y, dx);
+        y++;
+    }
+}
+
+void rectangle(){
+    int cx = 50, cy = 700;
+    int longeur = 100, largeur = 50;
+    for (int i = 0; i < 30; i++)
+    {
+        if (i == 15)
+        {
+            cx = 50;
+            cy = 650;
+        }
+        rec[i].cx = cx;
+        rec[i].cy = cy;
+        rec[i].xmin = rec[i].cx - longeur / 2;
+        rec[i].xmax = rec[i].cx + longeur / 2;
+        rec[i].ymin = rec[i].cy - largeur / 2;
+        rec[i].ymax = rec[i].cy + largeur / 2;
+        SDL_SetRenderDrawColor(renderer, 100+i, i * 20, 100-i, 255);
+        remplirRec(rec[i].xmin, rec[i].xmax, rec[i].ymin, rec[i].ymax);
+        cx += 100;
+    }
+}
+
 void all(){
+    SDL_SetRenderDrawColor(renderer,105,255,105,255);
     for (int i = 0; i < 2; i++){
         for (int j = 0; j < 3; j++){
             if (j == 2)
@@ -216,11 +247,13 @@ void all(){
             }
         }
     }
-    
+    SDL_SetRenderDrawColor(renderer,255,255,255,255);  
     algoNaif(0, 400, 750, 0);
     algoNaif(1500, 400, 750, 0);
     disque(x, y);
     rectangle();
+    pal();
+    SDL_SetRenderDrawColor(renderer,255,255,255,255);
 }
 
 int toitG(int xc, int yc){
@@ -275,14 +308,13 @@ int toitD(int xc, int yc){
     return 0;
 }
 
+
 int mouvement(){
 
     int stop = 0;
     int x_precedent, y_precedent;
     x_precedent = x;
     y_precedent = y;
-    int a, b;
-    float alpha;
 /*    
     SDL_Event event;
     SDL_bool quitter = SDL_FALSE;
@@ -317,10 +349,20 @@ int mouvement(){
             quit();
             return EXIT_SUCCESS;
         }*/
-        if (ymax >= HEIGHT){
-            uy = -uy;
-            stop++;
-        }
+            for (int i = 0; i < 30; i++){
+                //if (toit(x,y,rec[i].xmin, rec[i].xmax, rec[i].ymin, rec[i].ymax)){
+                if (ymin == rec[i].ymax && x >=rec[i].xmin && x<=rec[i].xmax)
+                {
+                    uy = -uy;
+                    stop++;
+                    break;
+                }
+            }
+            if (ymax >= HEIGHT)
+            {
+                uy = -uy;
+                stop++;
+            }
             if (ymin <= 10)
                 uy = -uy;
 
@@ -371,7 +413,6 @@ int mouvement(){
                                 else if (x_precedent < x){
                                     ux = -ux;
                                     uy = -uy;
-                                    printf("y_pre = %d,, y = %d\n",y_precedent, y);
                                 }
                             }
                             else if (y_precedent < y && uy !=0){
@@ -409,13 +450,13 @@ int mouvement(){
         }        
         x = x - ux;
         y = y - uy;
-
         all();
         if (ux == -4 || ux == 4)
             SDL_Delay(2);
         if (ux == -8 || ux == 8)
             SDL_Delay(6);
         SDL_RenderPresent(renderer);
+
     }
 }
 
@@ -446,14 +487,14 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    if (SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255) != 0) {    
+    if (SDL_SetRenderDrawColor(renderer, 5, 5, 0, 255) != 0) {    
         fprintf(stderr,"Color error %s", SDL_GetError());
         quit();
         return EXIT_FAILURE;
     }
-
-    //projection(o); // Projection des faces du polygone
-    //polygones(q); // Attribution des nouvelles coordonnées projetées au polygone
+    SDL_RenderClear(renderer);
+    // projection(o); // Projection des faces du polygone
+    // polygones(q); // Attribution des nouvelles coordonnées projetées au polygone
     x = ball.x;
     y = ball.y;
 

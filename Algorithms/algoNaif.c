@@ -70,7 +70,7 @@ void horizontale (int x0, int y0, int dx){
     }  
 }
 
-void algoNaif(int x0, int y0, int dx, int dy){
+void tracerLigne(int x0, int y0, int dx, int dy){
     int i, x, y;
     
     if (dx == 0){
@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
 
     int dx = points[1].x - points[0].x;
     int dy = points[1].y - points[0].y;
-    algoNaif(points[0].x, points[0].y, dx, dy);
+    tracerLigne(points[0].x, points[0].y, dx, dy);
     SDL_RenderPresent(renderer);
 
     SDL_Event event;

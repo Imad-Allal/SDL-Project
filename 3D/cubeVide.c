@@ -18,15 +18,15 @@ struct Lumiere{
     int lx,ly,lz;
 };
 
-struct Prl{
-    int px,py,pz;
-};
 
 struct Equation{
     int x, y, z, e;
     float tq;
 };
 
+struct Prl{
+    int px,py,pz;
+};
 
 struct Prl p1[N] = {
     {400, 400, 400},
@@ -172,7 +172,7 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    struct Oeil o = {250,250,-300};
+    struct Oeil o = {100,250,-300};
         projection(o);
         algoNaif(q[0].px, q[0].py, q[4].px, q[4].py);
         algoNaif(q[1].px, q[1].py, q[5].px, q[5].py);

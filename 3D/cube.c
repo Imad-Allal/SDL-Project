@@ -61,8 +61,8 @@ struct Lumiere cl[POL];
 struct Vecteur co[POL];
 struct Scalaire b[POL];
 
-struct Oeil o = {100,250,-500};
-struct Lumiere l = {200,90,-100};
+struct Oeil o = {250,250,-500};
+struct Lumiere l = {800,300,-100};
 
 void quit(){
     if (renderer != NULL)
@@ -243,7 +243,6 @@ void remplirPolygone(int xmin, int xmax, int index){
         cpt2++;
 
         verticale(x, y0, y1);
-        SDL_RenderPresent(renderer);
         x++;
     }
 }
@@ -347,7 +346,6 @@ void vNormal(){
         face[i][0].vx = (face[i][0].nx) / norme;
         face[i][0].vy = (face[i][0].ny) / norme;
         face[i][0].vz = (face[i][0].nz) / norme;
-        printf("Face = %d, n'x = %lf, n'y = %lf, n'z = %lf\n", i, face[i][0].vx, face[i][0].vy, face[i][0].vz);
     }
 }
 
@@ -366,8 +364,7 @@ void lumiere(struct Lumiere l){
         co[i].y = o.oy - face[i][0].cy;
         co[i].z = o.oz - face[i][0].cz;
 
-        b[i].x = face[i][0].vx * co[i].x + face[i][0].vy * co[i].y + face[i][0].vz * co[i].z;
-        printf("β = %lf\n", b[i].x);
+        b[i].x = face[i][0].vx * co[i].x + face[i][0].vy * co[i].y + face[i][0].vz * co[i].z; // La face eclairée
     }
     b[2].x = -b[2].x;
     b[4].x = -b[4].x;
@@ -386,7 +383,6 @@ void lumiere(struct Lumiere l){
         cl[i].vz = cl[i].lz / cl[i].ne; // Le rayon lumineux au point z
 
         cl[i].a = (cl[i].vx * face[i][0].vx) + (cl[i].vy * face[i][0].vy) + (cl[i].vz * face[i][0].vz); // l'intensité lumineuse α
-        printf("α = %lf\n", cl[i].a);
     }
 }
 
@@ -488,8 +484,8 @@ int main(int argc, char *argv[])
             SDL_SetRenderDrawColor(renderer, cl[i].a*255, cl[i].a*255, cl[i].a*255, 5);
         else
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 5);
+            
         remplirPolygone(xmin, xmax, i);
-        SDL_Delay(100);
         SDL_RenderPresent(renderer);
     }
 
