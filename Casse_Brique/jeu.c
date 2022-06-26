@@ -14,7 +14,7 @@ struct Rectangle{
     int xmin, xmax, ymin, ymax, cx, cy;
 };
 
-SDL_Point ball = {700, 1305};
+SDL_Point ball = {305, 1305};
 SDL_Point p_droite;
 SDL_Point tr[2][3] = {
     {{0, 0},
@@ -31,11 +31,13 @@ SDL_Point palette[4] = {{600,1370},
                         {900,1400}, 
                         {600,1400}
                         };
-
+int supprimerRec[SIZE];
+int taille = 0;
 int xmin, xmax, ymin, ymax;
 int x, y;
-int ux =15, uy = 15; //A modifier: ux = 1
+int ux =5, uy = 5; 
 int r = 25;
+int j = 0;
 
 void quit(){
     if (renderer != NULL)
@@ -210,26 +212,86 @@ void remplirRec(int x0, int x1, int y0, int y1){
     }
 }
 
+void commutation(int *a, int *b) 
+{ 
+int tmp = *a; 
+*a = *b; 
+*b = tmp; 
+}   
+// Selection Sort
+void trierTab(int tab[], int n) 
+{ 
+    int i, j, min; 
+    for (i = 0; i < n-1; i++) 
+    {
+    min = i; 
+    for (j = i+1; j < n; j++) 
+    if (tab[j] < tab[min]) 
+    min = j; 
+    commutation(&tab[min], &tab[i]); 
+    } 
+}
+
 void rectangle(){
     int cx = 50, cy = 700;
     int longeur = 100, largeur = 50;
-    for (int i = 0; i < 30; i++)
+    int cpt = 0, key = 0;
+
+    if (taille == 0)
     {
-        if (i == 15)
+        for (int i = 0; i < 30; i++)
         {
-            cx = 50;
-            cy = 650;
+            if (i == 15)
+            {
+                cx = 50;
+                cy = 650;
+            }
+            rec[i].cx = cx;
+            rec[i].cy = cy;
+            rec[i].xmin = rec[i].cx - longeur / 2;
+            rec[i].xmax = rec[i].cx + longeur / 2;
+            rec[i].ymin = rec[i].cy - largeur / 2;
+            rec[i].ymax = rec[i].cy + largeur / 2;
+            SDL_SetRenderDrawColor(renderer, 100+i, i * 20, 100-i, 255);
+            remplirRec(rec[i].xmin, rec[i].xmax, rec[i].ymin, rec[i].ymax);
+            cx += 100;
         }
-        rec[i].cx = cx;
-        rec[i].cy = cy;
-        rec[i].xmin = rec[i].cx - longeur / 2;
-        rec[i].xmax = rec[i].cx + longeur / 2;
-        rec[i].ymin = rec[i].cy - largeur / 2;
-        rec[i].ymax = rec[i].cy + largeur / 2;
-        SDL_SetRenderDrawColor(renderer, 100+i, i * 20, 100-i, 255);
-        remplirRec(rec[i].xmin, rec[i].xmax, rec[i].ymin, rec[i].ymax);
-        cx += 100;
     }
+    else{
+        if (taille > 1)
+            trierTab(supprimerRec, taille);
+        for (int i = 0; i < 30; i++)
+        {
+            key = 0;
+            while(cpt == 0 || cpt<taille){
+                if (i == supprimerRec[cpt]){
+                    cx += 100;
+                    key = 1;
+                    cpt++;
+                    break;
+                }
+                else
+                    break;
+            }
+
+            if (key)
+                continue;
+            if (i == 15)
+            {
+                cx = 50;
+                cy = 650;
+            }
+            rec[i].cx = cx;
+            rec[i].cy = cy;
+            rec[i].xmin = rec[i].cx - longeur / 2;
+            rec[i].xmax = rec[i].cx + longeur / 2;
+            rec[i].ymin = rec[i].cy - largeur / 2;
+            rec[i].ymax = rec[i].cy + largeur / 2;
+            SDL_SetRenderDrawColor(renderer, 100+i, i * 20, 100-i, 255);
+            remplirRec(rec[i].xmin, rec[i].xmax, rec[i].ymin, rec[i].ymax);
+            cx += 100;
+        }     
+    }       
 }
 
 void all(){
@@ -309,13 +371,13 @@ int toitD(int xc, int yc){
 
 int mouvement(){
 
-    int i = 0,j = 0;
+    int i = 0;
     int stop = 0;
-    int taille;
     int x_precedent, y_precedent;
     x_precedent = x;
     y_precedent = y;
 
+    printf("mouvement\n");
     while (stop < 3)
     {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -326,25 +388,31 @@ int mouvement(){
         ymin = y - r;
         xmax = x + r;
         ymax = y + r;
-
         /*if (ymax >= HEIGHT+r*2){
             quit();
             return EXIT_SUCCESS;
         }*/
         for (i = 0; i < 30; i++)
         {
-            printf("ymin = %d, ymax = %d, rec[%d].y = %d\n", ymin, ymax, i, rec[i].ymax);
-            if (ymin == rec[i].ymax && x >= rec[i].xmin && x <= rec[i].xmax)
+            if ((ymin == rec[i].ymax || ymax == rec[i].ymin) && x >= rec[i].xmin && x <= rec[i].xmax)
             {
                 uy = -uy;
                 stop++;
+                supprimerRec[j] = i;
                 j++;
+                taille++;
+                break;
+            }
+            else if ((xmin == rec[i].xmax || xmax == rec[i].xmin) && y >= rec[i].ymin && y <= rec[i].ymax)
+            {
+                ux = -ux;
+                stop++;
+                supprimerRec[j] = i;
+                j++;
+                taille++;
                 break;
             }
         }
-            taille = SIZE - j;
-            struct Rectangle recNv[taille];
-            rectangle(recNv, taille, i, j);
             if (ymax >= HEIGHT)
             {
                 uy = -uy;
@@ -372,19 +440,19 @@ int mouvement(){
                             }
                             else if (y_precedent < y && uy != 0)
                             {
-                                ux = 4;
+                                ux = 10;
                             }
                             else if (y_precedent == y && uy != 0){
-                                uy = -3;
+                                uy = -5;
                                 ux = 0;
                             }
                             else if (uy == 0) {
-                                uy = -3;
+                                uy = -5;
                                 ux = 0;
                             }
                         }
                         else{
-                            ux = -3;
+                            ux = -5;
                             uy = 0;
                         }
                     }
@@ -395,7 +463,7 @@ int mouvement(){
                         if(ux != 0){
                             if (y_precedent > y && uy !=0){
                                 if (x_precedent > x){
-                                    ux = 20;
+                                    ux = 10;
                                 }
                                 else if (x_precedent < x){
                                     ux = -ux;
@@ -403,19 +471,19 @@ int mouvement(){
                                 }
                             }
                             else if (y_precedent < y && uy !=0){
-                                ux = -1;
+                                ux = -10;
                             }
                             else if (y_precedent < y && uy != 0){
-                                uy = -3;
+                                uy = -5;
                                 ux = 0;
                             }
                             else if (uy == 0) {
-                                uy = -3;
+                                uy = -5;
                                 ux = 0;
                             }
                         }
                         else{
-                            ux = 3;
+                            ux = 5;
                             uy = 0;
                         }
                     }
@@ -437,11 +505,11 @@ int mouvement(){
         }        
         x = x - ux ;
         y = y - uy ;
-        all();
-        if (ux == -4 || ux == 4)
-            SDL_Delay(2);
-        if (ux == -8 || ux == 8)
-            SDL_Delay(6);
+        printf("taille = %d\n", taille);
+        for (int i = 0; i<taille; i++){
+            printf("rec[%d] = %d\n", i, supprimerRec[i]);
+        }
+            all();
         SDL_RenderPresent(renderer);
 
     }
@@ -484,6 +552,7 @@ int main(int argc, char *argv[])
     // polygones(q); // Attribution des nouvelles coordonnées projetées au polygone
     x = ball.x;
     y = ball.y;
+    int supprimerRec[SIZE];
 
     all();
     SDL_RenderPresent(renderer);
