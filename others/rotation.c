@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    window = SDL_CreateWindow("not1txf", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
+    window = SDL_CreateWindow("Rotation", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
     if (window == NULL){
         fprintf(stderr, "Window error: %s", SDL_GetError());
         quit();
@@ -130,7 +130,7 @@ int main(int argc, char *argv[])
     }
 
     if (SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255) != 0) {    
-        fprintf(stderr,"Collor error %s", SDL_GetError());
+        fprintf(stderr,"Color error %s", SDL_GetError());
         quit();
         return EXIT_FAILURE;
     }

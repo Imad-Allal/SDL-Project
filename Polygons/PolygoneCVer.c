@@ -236,7 +236,7 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    window = SDL_CreateWindow("not1txf", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
+    window = SDL_CreateWindow("Remplissage polygone verticalemet", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
     if (window == NULL){
         fprintf(stderr, "Window error: %s", SDL_GetError());
         quit();

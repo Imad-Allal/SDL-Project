@@ -4,7 +4,7 @@
 #include <math.h>
 #include <time.h>
 
-#define N 6
+#define N 6 // Nombre  de coins de l'etoile
 #define WIDTH 1500
 #define HEIGHT 1000
 #define PI 3.141592653589793
@@ -134,7 +134,7 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    window = SDL_CreateWindow("not1txf", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
+    window = SDL_CreateWindow("Etoile", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
     if (window == NULL){
         fprintf(stderr, "Window error: %s", SDL_GetError());
         quit();

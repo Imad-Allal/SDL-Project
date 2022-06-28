@@ -18,17 +18,7 @@ void quit(){
     SDL_Quit();
 }
 
-SDL_Point points[N];
-
-void initPoint()
-{
-    for (int i=0; i<N; i++)
-    {
-        points[i].x = 1+ rand()% HEIGHT;
-        points[i].y = 1+ rand()% WIDTH;
-        printf("(%d , %d)\n", points[i].x, points[i].y);
-    }
-}
+SDL_Point points[5];
 
 int Round(float x){
     return (int)(x + 0.5);
@@ -41,6 +31,7 @@ void verticale (int x0, int y0, int dy){
         for (i = y0; i <= y; i++)
         {
             SDL_RenderDrawPoint(renderer, x0, i);
+            SDL_RenderPresent(renderer);
         }
     }
     else{
@@ -48,6 +39,7 @@ void verticale (int x0, int y0, int dy){
         for (i = y0; i >= y; i--)
         {
             SDL_RenderDrawPoint(renderer, x0, i);
+            SDL_RenderPresent(renderer);
         }
     }    
 }
@@ -59,6 +51,7 @@ void horizontale (int x0, int y0, int dx){
         for (int i = x0; i <= x; i++)
         {
             SDL_RenderDrawPoint(renderer, i, y0);
+            SDL_RenderPresent(renderer);
         }
     }
     else {
@@ -66,6 +59,7 @@ void horizontale (int x0, int y0, int dx){
         for (int i = x0; i >= x; i--)
         {
             SDL_RenderDrawPoint(renderer, i, y0);
+            SDL_RenderPresent(renderer);
         }
     }  
 }
@@ -87,6 +81,7 @@ void tracerLigne(int x0, int y0, int dx, int dy){
                 x = x0 + i;
                 y = Round(y0 + m * i);
                 SDL_RenderDrawPoint(renderer, x, y);
+                SDL_RenderPresent(renderer);
             }
         }
         else{
@@ -95,6 +90,7 @@ void tracerLigne(int x0, int y0, int dx, int dy){
                 x = x0 + i;
                 y = Round(y0 + m * i);
                 SDL_RenderDrawPoint(renderer, x, y);
+                SDL_RenderPresent(renderer);
             }
         }
     }
@@ -109,7 +105,7 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    window = SDL_CreateWindow("not1txf", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
+    window = SDL_CreateWindow("Ma fenêtre", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
     if (window == NULL){
         fprintf(stderr, "Window error: %s", SDL_GetError());
         quit();
@@ -125,7 +121,7 @@ int main(int argc, char *argv[])
     }
 
     if (SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255) != 0) {    
-        fprintf(stderr,"Collor error %s", SDL_GetError());
+        fprintf(stderr,"Color error %s", SDL_GetError());
         quit();
         return EXIT_FAILURE;
     }
@@ -137,14 +133,14 @@ int main(int argc, char *argv[])
 
     int dx = points[1].x - points[0].x;
     int dy = points[1].y - points[0].y;
-    tracerLigne(points[0].x, points[0].y, dx, dy);
+    //tracerLigne(points[0].x, points[0].y, dx, dy);
     SDL_RenderPresent(renderer);
 
     SDL_Event event;
     SDL_bool quitter = SDL_FALSE;
 
     while(!quitter){
-        while (SDL_WaitEvent(&event)){
+        while (SDL_PollEvent(&event)){
             switch(event.type){
                 case SDL_KEYDOWN:
                 switch (event.key.keysym.sym) {
@@ -153,7 +149,7 @@ int main(int argc, char *argv[])
                         quitter = SDL_TRUE;
                         quit();
                         break;
-                    default:
+                        default:
                         printf("Vous avez appuyé sur la touche : %c\n", event.key.keysym.sym);
                         continue;
                     }
@@ -161,7 +157,6 @@ int main(int argc, char *argv[])
                 case SDL_KEYUP:
                 switch (event.key.keysym.sym) {
                     default:
-                        printf("touche : %c relaché\n",event.key.keysym.sym);
                         continue;
                     }
                 case SDL_QUIT: quitter = SDL_TRUE;

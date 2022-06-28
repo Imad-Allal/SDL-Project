@@ -3,7 +3,7 @@
 #include <SDL2/SDL.h>
 #include <time.h>
 
-#define SIZE 30
+#define SIZE 45
 #define WIDTH 1500
 #define HEIGHT 1500
 
@@ -201,12 +201,12 @@ void rectangle(){ // Tracage de rectangles
 
     if (taille == 0) // Liste de rectangles à supprimer vide ==> tracer tous les rectangles 
     {
-        for (int i = 0; i < 30; i++)
+        for (int i = 0; i < 45; i++)
         {
-            if (i == 15)
+            if (i == 15 || i == 30)
             {
                 cx = 50;
-                cy = 650;
+                cy -= 50;
             }
             rec[i].cx = cx;
             rec[i].cy = cy;
@@ -222,7 +222,7 @@ void rectangle(){ // Tracage de rectangles
     else{
         if (taille > 1) // Ne pas tracer les rectangles contenus dans la liste
             trierTab(supprimerRec, taille);
-        for (int i = 0; i < 30; i++)
+        for (int i = 0; i < 45; i++)
         {
             key = 0;
             while(cpt<taille){
@@ -240,10 +240,10 @@ void rectangle(){ // Tracage de rectangles
                 continue;
             }
 
-            if (i == 15) // Chaque ligne contient 15 rectangles, si on est alors dans le 15eme, on monte d'une ligne
+            if (i == 15 || i == 30) // Chaque ligne contient 15 rectangles, si on est alors dans le 15eme, on monte d'une ligne
             {
                 cx = 50;
-                cy = 650;
+                cy -= 50;
             }
             rec[i].cx = cx;
             rec[i].cy = cy;
@@ -399,7 +399,7 @@ int mouvement(){ // Animation du disque dans le terrain
     if (ymax >= HEIGHT+r*2){ // Balle sort du terrain en bas
         return EXIT_FAILURE;
     }
-    for (i = 0; i < 30; i++)
+    for (i = 0; i < 45; i++)
     {
         if ((ymin == rec[i].ymax || ymax == rec[i].ymin) && x >= rec[i].xmin && x <= rec[i].xmax) // Ball tape en haut ou en bas des rectangles
         {
@@ -537,7 +537,7 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    window = SDL_CreateWindow("not1txf", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
+    window = SDL_CreateWindow("Casse Briques", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
     if (window == NULL){
         fprintf(stderr, "Window error: %s", SDL_GetError());
         quit();
